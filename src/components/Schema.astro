@@ -1,0 +1,51 @@
+---
+// src/components/Schema.astro
+import { generateSchema } from '../utils/schema.js';
+import { suburbs } from '../utils/geoHandler.js';
+
+// Generate a default schema on the server for initial load and crawlers.
+const initialSchema = generateSchema({ name: "Redbank Plains" }, suburbs);
+---
+
+<script type="application/ld+json" set:html={initialSchema} id="dynamic-schema"></script>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    if (typeof window !== 'undefined') {
+      const schemaScript = document.getElementById('dynamic-schema');
+      
+      Promise.all([
+        import('../utils/schema.js'),
+        // CORRECTED: Import the correctly named client-side function.
+        import('../utils/geoHandler.js') 
+      ]).then(([{ generateSchema }, { loadSuburbDataClient }]) => {
+
+        const updateDisplay = async (suburbName) => {
+          if (!schemaScript) return;
+          try {
+            // CORRECTED: Call the correctly named function.
+            const allSuburbs = await loadSuburbDataClient(); 
+            const suburbData = allSuburbs.find(s => s.name === suburbName) || { name: suburbName, coords: {}, postcode: '', landmarks: [] };
+            
+            setTimeout(() => {
+              schemaScript.textContent = generateSchema(suburbData, allSuburbs);
+            }, 300);
+
+          } catch (e) {
+            console.error('Schema generation error:', e);
+            if (typeof gtag === 'function') {
+              gtag('event', 'exception', { 'description': `Schema_Error: ${e.message}`, 'fatal': false });
+            }
+          }
+        };
+
+        const preferredSuburb = localStorage.getItem('preferredSuburb') || "Redbank Plains";
+        updateDisplay(preferredSuburb);
+
+        document.addEventListener('suburbChanged', (e) => {
+          updateDisplay(e.detail.name);
+        });
+      });
+    }
+  });
+</script>

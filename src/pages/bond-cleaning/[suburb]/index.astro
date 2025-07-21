@@ -1,0 +1,87 @@
+---
+// src/pages/bond-cleaning/[suburb]/index.astro
+
+// --- LAYOUTS, COMPONENTS, & UTILITIES ---
+import MainLayout from '~/layouts/MainLayout.astro';
+import { Image } from 'astro:assets';
+import { suburbs as allSuburbs } from '~/utils/geoHandler.js'; // Use an alias for clarity
+import { generateSchema } from '~/utils/schema.js';
+import slugify from '~/utils/slugify.js';
+
+// --- SERVER-SIDE PAGE GENERATION ---
+
+export function getStaticPaths() {
+  const heroImages = import.meta.glob('/src/assets/images/suburbs/*.{jpg,jpeg,png,webp}');
+  const allImagePaths = Object.keys(heroImages);
+
+  return allSuburbs.map(suburb => {
+    const slug = slugify(suburb.name);
+
+    const imagePathKey = allImagePaths.find(
+      (path) => path.includes(`/${slug}-hero.`)
+    );
+
+    if (!imagePathKey) {
+      throw new Error(`Hero image not found for slug "${slug}" in /src/assets/images/suburbs/`);
+    }
+
+    return {
+      params: { suburb: slug },
+      props: { 
+        suburb: suburb,
+        heroImage: heroImages[imagePathKey]()
+      },
+    };
+  });
+}
+
+const { suburb, heroImage } = Astro.props;
+
+// --- PAGE-SPECIFIC METADATA & SCHEMA ---
+const pageTitle = `${suburb.name} Bond Cleaning | 100% Bond Back Guarantee`;
+const pageDescription = `Your local ${suburb.name} (${suburb.postcode}) bond cleaning specialists.`;
+// CORRECT: Pass the specific `suburb` object to generate a targeted schema.
+const schemaString = generateSchema(suburb, allSuburbs);
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={schemaString}></script>
+    <link rel="canonical" href={`https://onendonebondclean.com.au/bond-cleaning/${slugify(suburb.name)}/`} />
+  </Fragment>
+
+  <!-- Hero Section with Dynamic Image -->
+  <section class="relative bg-deep-navy text-white text-center py-20">
+      <div class="absolute inset-0 opacity-20">
+          <Image 
+              src={heroImage} 
+              alt={`Bond cleaning services in ${suburb.name}`}
+              class="w-full h-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+          />
+      </div>
+      <div class="relative z-10">
+          <h1 class="text-4xl md:text-5xl font-extrabold">Bond Cleaning {suburb.name}</h1>
+          <p class="mt-4 text-lg text-light-sky">Local specialists, guaranteed results.</p>
+      </div>
+  </section>
+
+  <section class="py-16">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-2xl font-bold">Why Choose Us for Your {suburb.name} Clean?</h2>
+      <p class="mt-2 text-gray-warm-700 max-w-2xl mx-auto">
+        We are your local experts, familiar with the area and properties near landmarks like {suburb.landmarks.join(' and ')}.
+      </p>
+    </div>
+  </section>
+
+  <!-- You could add more sections here, like the QuoteForm or a suburb-specific checklist link -->
+  <!-- 
+    <section class="py-16 bg-light-gray">
+      <QuoteForm client:visible />
+    </section>
+  -->
+
+</MainLayout>

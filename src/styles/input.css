@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Base Layer: Global resets & root variables --- */
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+    }
+  }
+  body {
+    @apply font-sans bg-light-gray text-gray-800 antialiased;
+  }
+  body.menu-open {
+    @apply overflow-hidden overscroll-contain;
+    position: fixed;    /* Prevents scroll jump on iOS */
+    width: 100%;        /* Avoids layout shift */
+    touch-action: none; /* Prevents mobile rubber-banding */
+  }
+}
+
+/* --- Components Layer: Reusable blocks & accessibility --- */
+@layer components {
+  /* Focus states for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-blue-500 outline-offset-2;
+  }
+
+  /* FAQ Accordion with grid+max-height fallback for animation */
+  .faq-item > .animate-sweep {
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, grid-template-rows 0.3s;
+    max-height: 0;
+  }
+  .faq-item[open] > .animate-sweep {
+    max-height: 100vh; /* fallback for older browsers */
+  }
+  @supports (grid-template-rows: subgrid) {
+    .faq-item > .animate-sweep {
+      display: grid;
+      grid-template-rows: 0fr;
+      max-height: none;
+    }
+    .faq-item[open] > .animate-sweep {
+      grid-template-rows: 1fr;
+    }
+    .faq-item > .animate-sweep > * {
+      min-height: 0;
+    }
+  }
+
+  /* Step Indicator (horizontal progress with overflow and accessibility) */
+  .step-indicator {
+    @apply relative flex justify-center gap-2 sm:gap-4 mb-8 overflow-x-auto pb-2;
+    scrollbar-width: none;
+    mask: linear-gradient(90deg, transparent, black 20px, black calc(100% - 20px), transparent);
+    contain: layout paint style;
+  }
+  .step-indicator::-webkit-scrollbar {
+    display: none;
+  }
+  .step-indicator::before {
+    content: '';
+    @apply absolute top-1/2 left-4 right-4 h-0.5 bg-gray-300 -translate-y-1/2 z-0;
+    inset-inline: 1rem; /* Logical property for RTL */
+  }
+
+  /* Thumbnail images - aspect ratio, performance, and CLS */
+  .thumbnail-item {
+    contain: layout paint style;
+  }
+  .thumbnail-item img {
+    @apply aspect-[4/3] object-cover w-full;
+    content-visibility: auto; /* Performance boost */
+    /* NOTE: Add width & height in HTML for CLS prevention */
+  }
+}
+
+/* --- Utilities Layer: Special-case styles --- */
+@layer utilities {
+  /* Focus state for forced-colors mode (high contrast) */
+  @media (forced-colors: active) {
+    .form-checkbox-label.selected:focus-visible {
+      outline: 2px solid CanvasText;
+      outline-offset: 2px;
+    }
+    /* Expand for other controls as needed */
+  }
+}

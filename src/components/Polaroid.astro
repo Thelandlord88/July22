@@ -1,0 +1,240 @@
+<!-- Polaroid Gallery Section with Animated Bubble Background -->
+<section class="polaroid-section-wrapper" style="position:relative; overflow:hidden;">
+  <!-- Bubble Background -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <!-- Main Polaroid Section -->
+  <section class="polaroid-section">
+    <h2 class="section-title">Yesterday’s Jobs in Polaroids</h2>
+    <div class="gallery-grid">
+      <!-- Card 1 -->
+      <article class="polaroid" style="--delay:0s">
+        <div class="polaroid-inner">
+          <div class="side front">
+            <img src="https://placehold.co/400x400/cccccc/333333?text=Before" alt="Before clean – dusty patio">
+            <span class="label">Before</span>
+          </div>
+          <div class="side back">
+            <img src="https://placehold.co/400x400/87CEEB/333333?text=After" alt="After clean – sparkling patio">
+            <span class="label">After</span>
+          </div>
+        </div>
+        <p class="caption">Patio Pressure Wash</p>
+      </article>
+      <!-- Card 2 -->
+      <article class="polaroid" style="--delay:.15s">
+        <div class="polaroid-inner">
+          <div class="side front">
+            <img src="https://placehold.co/400x400/d3d3d3/333333?text=Before" alt="Before clean – messy garage">
+            <span class="label">Before</span>
+          </div>
+          <div class="side back">
+            <img src="https://placehold.co/400x400/98FB98/333333?text=After" alt="After clean – organized garage">
+            <span class="label">After</span>
+          </div>
+        </div>
+        <p class="caption">Garage Organization</p>
+      </article>
+      <!-- Card 3 -->
+      <article class="polaroid" style="--delay:.3s">
+        <div class="polaroid-inner">
+          <div class="side front">
+            <img src="https://placehold.co/400x400/a9a9a9/333333?text=Before" alt="Before clean – overgrown garden">
+            <span class="label">Before</span>
+          </div>
+          <div class="side back">
+            <img src="https://placehold.co/400x400/FFD700/333333?text=After" alt="After clean – trimmed garden">
+            <span class="label">After</span>
+          </div>
+        </div>
+        <p class="caption">Garden Weeding & Trim</p>
+      </article>
+      <!-- Card 4 -->
+      <article class="polaroid" style="--delay:.45s">
+        <div class="polaroid-inner">
+          <div class="side front">
+            <img src="https://placehold.co/400x400/b0c4de/333333?text=Before" alt="Before clean – dirty windows">
+            <span class="label">Before</span>
+          </div>
+          <div class="side back">
+            <img src="https://placehold.co/400x400/ADD8E6/333333?text=After" alt="After clean – clear windows">
+            <span class="label">After</span>
+          </div>
+        </div>
+        <p class="caption">Exterior Window Cleaning</p>
+      </article>
+      <!-- Card 5 -->
+      <article class="polaroid" style="--delay:.6s">
+        <div class="polaroid-inner">
+          <div class="side front">
+            <img src="https://placehold.co/400x400/778899/333333?text=Before" alt="Before clean – cluttered attic">
+            <span class="label">Before</span>
+          </div>
+          <div class="side back">
+            <img src="https://placehold.co/400x400/f0e68c/333333?text=After" alt="After clean – clean attic">
+            <span class="label">After</span>
+          </div>
+        </div>
+        <p class="caption">Attic Clear-out</p>
+      </article>
+      <!-- Card 6 -->
+      <article class="polaroid" style="--delay:.75s">
+        <div class="polaroid-inner">
+          <div class="side front">
+            <img src="https://placehold.co/400x400/c0c0c0/333333?text=Before" alt="Before clean – grimy driveway">
+            <span class="label">Before</span>
+          </div>
+          <div class="side back">
+            <img src="https://placehold.co/400x400/e6e6fa/333333?text=After" alt="After clean – pristine driveway">
+            <span class="label">After</span>
+          </div>
+        </div>
+        <p class="caption">Driveway Power Wash</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Bubble & Polaroid Styles (add to your main CSS file or <style> block) -->
+  <style>
+    /* Google Fonts (make sure these are linked in your main layout if not already) */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Kalam:wght@700&display=swap');
+
+    .polaroid-section-wrapper {
+      background: linear-gradient(135deg, #232323, #1a1a1a);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ---------- Bubble Background ---------- */
+    .bubbles {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -50px;
+      background-color: rgba(255,255,255,0.17);
+      border-radius: 50%;
+      animation: rise 20s infinite;
+    }
+    @keyframes rise {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+    }
+    .bubble:nth-child(1) { left: 10%; width: 20px; height: 20px; animation-duration: 15s; animation-delay: 0s; }
+    .bubble:nth-child(2) { left: 20%; width: 10px; height: 10px; animation-duration: 25s; animation-delay: 2s; }
+    .bubble:nth-child(3) { left: 35%; width: 25px; height: 25px; animation-duration: 18s; animation-delay: 5s; }
+    .bubble:nth-child(4) { left: 50%; width: 15px; height: 15px; animation-duration: 22s; animation-delay: 1s; }
+    .bubble:nth-child(5) { left: 65%; width: 8px; height: 8px; animation-duration: 30s; animation-delay: 7s; }
+    .bubble:nth-child(6) { left: 80%; width: 18px; height: 18px; animation-duration: 16s; animation-delay: 3s; }
+    .bubble:nth-child(7) { left: 90%; width: 12px; height: 12px; animation-duration: 28s; animation-delay: 6s; }
+    .bubble:nth-child(8) { left: 5%; width: 22px; height: 22px; animation-duration: 19s; animation-delay: 4s; }
+    .bubble:nth-child(9) { left: 95%; width: 14px; height: 14px; animation-duration: 24s; animation-delay: 8s; }
+    .bubble:nth-child(10) { left: 25%; width: 16px; height: 16px; animation-duration: 20s; animation-delay: 0s; }
+
+    /* ---------- Polaroid Section & Gallery ---------- */
+    .polaroid-section {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 1rem;
+      perspective: 1500px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      margin-bottom: 3rem;
+      color: #e5e7eb;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 4rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .polaroid {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      transform-style: preserve-3d;
+      transition: transform .6s ease;
+      animation: fadeInUp 1s ease-out forwards;
+      animation-delay: var(--delay, 0s);
+      opacity: 0;
+    }
+    .polaroid-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .7s ease-in-out;
+    }
+    .polaroid:hover .polaroid-inner {
+      transform: rotateY(180deg);
+    }
+    .side {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border: 10px solid #fefefe;
+      border-bottom-width: 60px;
+      box-shadow:
+        inset 1px 1px 3px rgba(255, 255, 255, .7),
+        inset -2px -2px 3px rgba(0, 0, 0, .25),
+        0 10px 25px rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .side img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .label {
+      position: absolute;
+      bottom: -45px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'Kalam', cursive;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+    }
+    .back {
+      transform: rotateY(180deg);
+    }
+    .caption {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: .9rem;
+      color: #a0a0a0;
+    }
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(60px) scale(.9);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+</section>

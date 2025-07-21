@@ -1,0 +1,60 @@
+---
+// src/components/sections/HeroSection.astro
+import { Image } from 'astro:assets';
+import heroImage from '/src/assets/images/before.png';
+import WaveBackground from '../WaveBackground.astro';
+import WaveDivider from '../WaveDivider.astro'; // 1. Import the new divider component
+
+export interface Props {
+  suburb?: {
+    name: string;
+  };
+}
+const { suburb } = Astro.props;
+
+const displayName = suburb?.name ?? 'Redbank Plains';
+---
+
+{/* 2. Remove overflow-hidden to allow the divider to show */}
+<section id="hero" class="relative bg-deep-navy pb-0px">
+    <WaveBackground />
+
+    <div class="container mx-auto px-6 py-24 md:py-32 flex flex-col lg:flex-row items-center gap-12 relative z-10">
+        
+        <div class="lg:w-1/2 text-center lg:text-left">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">
+                Get Your Bond Back, <span class="text-fresh-sky">Guaranteed.</span>
+            </h1>
+            <p class="mt-6 text-lg text-slate-200 max-w-xl mx-auto lg:mx-0">
+                We’re Trent & Pandora, a local family team from <span class="suburb-placeholder font-semibold text-white">{displayName}</span> taking the stress out of moving. We offer a 100% Bond Back Guarantee on every clean. <strong>Done right, the first time.</strong>
+            </p>
+            <div class="mt-10 flex justify-center lg:justify-start">
+                <a 
+                    href="#quote" 
+                    class="mobile-touch-target inline-flex items-center gap-3 bg-fresh-sky text-white font-bold py-4 px-8 rounded-full shadow-lg hover:bg-sky-600 focus-visible:ring-4 focus-visible:ring-fresh-sky/50 transition-all text-lg"
+                    aria-label="Get My 100% Guaranteed Quote - Get a free quote for your bond clean"
+                >
+                    <span>Get My 100% Guaranteed Quote</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto rounded-2xl shadow-2xl overflow-hidden">
+  <Image 
+    src={heroImage}
+    alt="Trent and Pandora from One N Done Bond Clean"
+    width={400}  /* Use actual image width */
+    height={300} /* Use actual image height */
+    class="object-contain w-full h-auto"
+    decoding="async"
+    loading="lazy"
+    formats={['avif', 'webp']}
+    fetchpriority="auto"
+  />
+</div>
+
+    {/* 3. Add the divider component at the end of the section */}
+	   <WaveDivider >
+	   <WaveDivider />
+</section>

@@ -1,0 +1,27 @@
+---
+export interface Props {
+  question: string;
+  answer: string;
+}
+const { question, answer } = Astro.props;
+---
+
+<details class="faq-item py-4 border-b border-gray-warm-200 last:border-b-0">
+  <summary class="flex justify-between items-center cursor-pointer font-semibold list-none text-lg">
+    <span>{question}</span>
+    <span class="details-marker transition-transform duration-300">
+      <!-- Chevron (rotates on open) -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </span>
+  </summary>
+
+  <!-- Animated reveal -->
+  <div class="animate-sweep overflow-hidden">
+    <div class="pt-4 text-gray-warm-700">
+      <p>{answer}</p>
+    </div>
+  </div>
+</details>

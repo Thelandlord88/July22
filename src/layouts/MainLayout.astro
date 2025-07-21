@@ -1,0 +1,61 @@
+---
+// src/layouts/MainLayout.astro
+
+// --- INTERFACE ---
+// CORRECTED: The layout no longer needs to know about the schema. It's truly generic.
+export interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+// --- COMPONENTS & DATA ---
+import Header from '~/components/Header.astro';
+import Footer from '~/components/Footer.astro';
+import { suburbs } from '~/utils/geoHandler.js'; 
+
+// --- ASTRO FEATURES ---
+import { ViewTransitions } from 'astro:transitions';
+
+// CORRECTED: Import the global stylesheet directly for Astro's bundler to process.
+import '~/styles/input.css';
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/images/og.jpg', Astro.site)} />
+
+    <!-- REMOVED: The hardcoded schema script is gone. -->
+
+    <!-- ADDED: A named slot. Any page can now inject content into the <head>. -->
+    <slot name="head" />
+
+    <ViewTransitions />
+  </head>
+  <body class="bg-light-gray font-sans text-gray-warm-800">
+    
+    <!-- The layout passes the necessary suburbs data down to the Header. -->
+    <Header suburbs={suburbs} />
+
+    <main>
+      <!-- The default slot where all main page content will be rendered. -->
+      <slot />
+    </main>
+
+    <Footer />
+    
+  </body>
+</html>

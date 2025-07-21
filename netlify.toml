@@ -1,0 +1,13 @@
+# This is the main build configuration for Netlify.
+[build]
+  # This command tells Netlify to run the "build" script from your package.json.
+  command = "npm run build"
+  # This is the directory that Netlify will deploy. Astro builds to "dist" by default.
+  publish = "dist/"
+
+# --- Recommended additions for build stability ---
+[build.environment]
+  # Set the Node.js and npm versions to match your local environment.
+  # This prevents unexpected build failures if Netlify updates its defaults.
+  NODE_VERSION = "20" # Or your specific Node.js version (e.g., "18.14.1")
+  NPM_VERSION = "10"  # Or your specific npm version

@@ -1,0 +1,45 @@
+---
+import FAQItem from './FAQItem.astro';
+
+const faqData = [
+  { q: "What is your 100% Bond Back Guarantee?", a: "If your property manager finds any issue, we return free within 72 h to fix it." },
+  { q: "Is the price on my quote final?", a: "Yes, unless the condition is materially different — we’ll always confirm first." },
+  { q: "What’s included in a standard bond clean?", a: "Kitchen, bathrooms, walls, floors, windows (interior & tracks) — full checklist supplied." },
+  { q: "Add-on services?", a: "Carpet steam cleaning & wall washing are popular extras selectable in the form." },
+  { q: "Do I need to be present?", a: "No. Just leave keys in a lockbox; ensure power, hot water, and empty premises." },
+  { q: "Are you insured?", a: "Yes — $10 M public liability." },
+  { q: "How do I book?", a: "Complete the 60-second quote form or call 0405 779 420." }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqData.map((item, i) => ({
+    "@type": "Question",
+    "@id": `q${i + 1}`,
+    "name": item.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.a
+    }
+  }))
+};
+---
+
+<section id="faq" class="py-20 bg-light-gray">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-deep-navy">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="max-w-3xl mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md">
+      {faqData.map((item, i) => (
+        <div id={`q${i + 1}`}>
+          <FAQItem question={item.q} answer={item.a} />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

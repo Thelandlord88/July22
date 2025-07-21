@@ -1,0 +1,31 @@
+---
+// src/components/sections/AboutSection.astro
+import { Image } from 'astro:assets';
+import teamImage from '../../assets/images/usdown.webp';
+---
+<section id="about" class="bg-white py-20 md:py-28">
+    <div class="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-12">
+       <div class="lg:w-1/2">
+           <Image 
+               src={teamImage} 
+               alt="Trent and Pandora from One N Done Bond Clean, a local family team." 
+               class="rounded-2xl shadow-xl w-full object-cover" 
+               style="aspect-ratio: 4/3;" 
+               loading="lazy" 
+               width="1024"
+               formats={['avif', 'webp']}
+               decoding="async"
+           />
+       </div>
+       <div class="lg:w-1/2 text-center lg:text-left">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-deep-navy">Meet Trent & Pandora</h2>
+            <p class="mt-6 text-lg text-gray-600">
+                "Hi, we're the team behind One N Done Bond Clean! I'm Trent, and my four-legged boss is Pandora. As a local, family-owned business from <span class="suburb-placeholder font-semibold">Redbank Plains</span>, we pour our hearts into every job. We’re not about rushing through a checklist; we’re about providing an honest, reliable service that makes your life easier."
+            </p>
+            <div class="mt-8 bg-sky-50 p-6 rounded-2xl border-l-4 border-fresh-sky">
+                <h4 class="font-bold text-lg text-deep-navy">Our Promise:</h4>
+                <p class="mt-2 text-gray-700">"To treat your home with respect, to communicate clearly, and to guarantee our work, every single time."</p>
+            </div>
+       </div>
+    </div>
+</section>

@@ -1,0 +1,148 @@
+---
+// src/components/SparkleWipeDivider.astro
+---
+
+<div class="sparkle-reveal-container">
+  <div class="wipe-wrapper">
+    <svg class="wipe-cloth" viewBox="0 0 1440 200" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="shineGradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#e0f2fe" stop-opacity="0.9" />
+        </linearGradient>
+        <clipPath id="clothMask">
+          <rect x="0" y="0" width="0" height="100%">
+            {/* The animation moves the rect's width from 0 to 100% */}
+            <animate 
+              attributeName="width" 
+              values="0;100%" 
+              dur="1.5s"
+              fill="freeze" 
+              calcMode="spline" 
+              keyTimes="0;1"
+              keySplines="0.25 0.1 0.25 1"
+              begin="indefinite"
+            />
+          </rect>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#clothMask)">
+        <path d="M0,0 L1440,0 L1440,200 L0,200 Z" fill="url(#shineGradient)" />
+      </g>
+    </svg>
+
+    <div class="sparkles" aria-hidden="true">
+      <span class="sparkle" style="--delay:0.1; --x-end: 150px;"></span>
+      <span class="sparkle" style="--delay:0.2; --x-end: 250px;"></span>
+      <span class="sparkle" style="--delay:0.3; --x-end: 350px;"></span>
+      <span class="sparkle" style="--delay:0.4; --x-end: 450px;"></span>
+      <span class="sparkle" style="--delay:0.5; --x-end: 550px;"></span>
+      <span class="sparkle" style="--delay:0.6; --x-end: 650px;"></span>
+      <span class="sparkle" style="--delay:0.7; --x-end: 750px;"></span>
+      <span class="sparkle" style="--delay:0.8; --x-end: 850px;"></span>
+    </div>
+  </div>
+
+  <div class="next-section">
+    <slot /> </div>
+</div>
+
+<script>
+  // This script triggers the animation when the element scrolls into view.
+  document.addEventListener('astro:page-load', () => {
+    const containers = document.querySelectorAll('.sparkle-reveal-container');
+
+    if (containers.length === 0) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const svgAnimateElement = entry.target.querySelector('animate');
+          if (svgAnimateElement) {
+            svgAnimateElement.beginElement();
+          }
+          // We only want it to trigger once, so we unobserve it.
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.5 // Trigger when 50% of the element is visible
+    });
+
+    containers.forEach(container => {
+      observer.observe(container);
+    });
+  });
+</script>
+
+<style>
+  .sparkle-reveal-container {
+    width: 100%;
+  }
+
+  .wipe-wrapper {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .wipe-cloth {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sparkles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .sparkle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: white;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    top: 50%;
+    left: 0;
+    animation: pop 1.8s ease-out forwards;
+    animation-delay: calc(var(--delay, 0) * 1.5s);
+  }
+
+  @keyframes pop {
+    0% {
+      transform: translate(0, -50%) scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    60% {
+      transform: translate(var(--x-end, 100px), -50%) scale(1.4) rotate(180deg);
+    }
+    100% {
+      transform: translate(var(--x-end, 100px), -50%) scale(0) rotate(360deg);
+      opacity: 0;
+    }
+  }
+  
+  /* Revealed Section Styles */
+  .next-section {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 1.5s;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
