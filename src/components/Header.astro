@@ -1,49 +1,76 @@
 ---
 // src/components/Header.astro
-import { Image } from 'astro:assets';
-import logo from '/src/assets/images/logo.svg';
-
 export interface Props {
-  suburbs: { name: string; slug: string }[];
+  suburbs: Array<{ name: string }>;
 }
 const { suburbs } = Astro.props;
-
-const defaultSuburb = "Redbank Plains";
+import { Image } from 'astro:assets';
+import logoImg from '~/assets/images/logo.svg'; // Adjust as needed
+const DEFAULT_SUBURB_DISPLAY = "Redbank Plains";
 ---
 
-<header id="main-header" class="bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm transition-all duration-300">
+<header
+  id="main-header"
+  class="
+    sticky top-0 z-50
+    shadow-md
+    bg-gradient-to-r from-white via-[#e0f2fe] to-[#0c2f5a]
+    dark:from-slate-200 dark:via-[#94a3b8] dark:to-[#0c2f5a]
+    backdrop-blur-lg
+    transition-all duration-300
+  "
+>
   <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-    <!-- Logo -->
-    <a href="/" class="group flex items-center gap-2" aria-label="One N Done Bond Clean Home">
-      <Image 
-        src={logo} 
-        alt="One N Done Bond Clean Logo" 
-        class="h-12 w-12 transition-transform duration-300 group-hover:scale-105" 
-        width="48" 
-        height="48" 
-        fetchpriority="high" 
-      />
+    <!-- Logo: crisp, centered, with deep shadow and blue border -->
+    <a
+      href="/"
+      class="flex items-center gap-2 group"
+      aria-label="One N Done Bond Clean Home"
+    >
+      <span
+        class="
+          inline-flex items-center justify-center
+          bg-white/95
+          rounded-full
+          shadow-2xl
+          border-2 border-sky-100
+          p-1
+          ring-2 ring-white ring-offset-2
+          transition-all
+          group-hover:scale-105
+          group-hover:shadow-[0_4px_32px_0_rgba(14,165,233,0.30)]
+        "
+        style="box-shadow: 0 6px 24px 0 rgba(12,47,90,0.30), 0 1.5px 6px 0 rgba(14,165,233,0.11);"
+      >
+        <Image
+          src={logoImg}
+          alt="One N Done Bond Clean Logo"
+          class="h-12 w-12 md:h-14 md:w-14"
+          width={56}
+          height={56}
+          fetchpriority="high"
+          style="display: block; margin: 0 auto;"
+        />
+      </span>
       <span class="sr-only md:not-sr-only font-extrabold text-deep-navy text-xl">One N Done</span>
     </a>
 
     <!-- Desktop Navigation -->
     <div class="hidden lg:flex items-center gap-6">
       <!-- Location Section -->
-      <div class="flex items-center gap-3 bg-light-sky px-4 py-2 rounded-full shadow-sm">
-        <svg class="w-5 h-5 text-fresh-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <div class="flex items-center gap-3 bg-light-sky/70 px-4 py-2 rounded-full shadow-sm">
+        <svg class="w-5 h-5 text-fresh-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
         </svg>
-        <span class="text-gray-700">Serving <span id="current-suburb" class="font-semibold text-deep-navy">{defaultSuburb}</span></span>
-        
-        <!-- Suburb Selector -->
+        <span id="current-suburb-display" class="text-gray-700">
+          Serving <span id="current-suburb" class="font-semibold text-deep-navy">{DEFAULT_SUBURB_DISPLAY}</span>
+        </span>
         <div class="suburb-selector relative">
-          <select 
-            id="suburb-selector-desktop" 
-            aria-label="Select your suburb"
-            class="appearance-none bg-transparent pl-2 pr-6 py-1 text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-l border-gray-300"
-          >
-            {suburbs.map(suburb => <option value={suburb.name}>{suburb.name}</option>)}
+          <select id="suburb-selector-desktop" aria-label="Select your suburb" class="appearance-none bg-transparent pl-2 pr-6 py-1 text-gray-700 cursor-pointer focus:outline-none border-l border-gray-300">
+            {suburbs.map((suburb) => (
+              <option value={suburb.name}>{suburb.name}</option>
+            ))}
           </select>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-fresh-sky">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,62 +79,76 @@ const defaultSuburb = "Redbank Plains";
           </div>
         </div>
       </div>
-      
+
       <!-- Navigation Links -->
-      <div class="flex space-x-6 items-center font-medium text-gray-700">
-        <a href="/#difference" class="relative py-2 group">
-          The Difference
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-fresh-sky transition-all duration-300 group-hover:w-full"></span>
-        </a>
-        <a href="/#services" class="relative py-2 group">
-          Services
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-fresh-sky transition-all duration-300 group-hover:w-full"></span>
-        </a>
-        <a href="/#about" class="relative py-2 group">
-          About Us
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-fresh-sky transition-all duration-300 group-hover:w-full"></span>
-        </a>
+      <div class="flex items-center gap-6 font-medium">
+        <a href="/#difference"
+          class="relative px-2 py-1 text-deep-navy transition-all duration-150 ease-in-out
+          after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-fresh-sky after:transition-all after:duration-200 after:rounded-full
+          hover:text-fresh-sky focus:text-fresh-sky
+          hover:after:w-full focus:after:w-full"
+        >The Difference</a>
+        <a href="/#services"
+          class="relative px-2 py-1 text-deep-navy transition-all duration-150 ease-in-out
+          after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-fresh-sky after:transition-all after:duration-200 after:rounded-full
+          hover:text-fresh-sky focus:text-fresh-sky
+          hover:after:w-full focus:after:w-full"
+        >Services</a>
+        <a href="/#about"
+          class="relative px-2 py-1 text-deep-navy transition-all duration-150 ease-in-out
+          after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-fresh-sky after:transition-all after:duration-200 after:rounded-full
+          hover:text-fresh-sky focus:text-fresh-sky
+          hover:after:w-full focus:after:w-full"
+        >About Us</a>
       </div>
-      
+
       <!-- CTA Button -->
-      <a href="/#quote" class="bg-fresh-sky hover:bg-deep-navy text-white font-bold py-2 px-5 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:ring-fresh-sky">
-        Get Quote
+      <a href="#quote"
+        class="bg-fresh-sky hover:bg-deep-navy text-white font-bold py-2 px-5 rounded-full shadow transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fresh-sky whitespace-nowrap"
+      >
+        Get a Quote
       </a>
     </div>
 
     <!-- Mobile Menu Button -->
-    <button 
-      id="menu-btn" 
-      class="lg:hidden text-gray-800 focus:outline-none focus:ring-2 focus:ring-fresh-sky rounded-md p-2"
-      aria-label="Toggle navigation menu" 
-      aria-expanded="false" 
-      aria-controls="mobile-menu"
-    >
-      <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-      </svg>
-      <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
+    <div class="lg:hidden flex items-center">
+      <button
+        id="mobile-menu-toggle"
+        type="button"
+        class="text-deep-navy hover:text-fresh-sky focus:outline-none focus:text-fresh-sky"
+        aria-expanded="false"
+        aria-label="Toggle navigation menu"
+        aria-controls="mobile-menu"
+      >
+        <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div 
-    id="mobile-menu" 
-    class="hidden lg:hidden bg-white px-4 py-4 shadow-lg max-h-0 overflow-hidden transition-all duration-300 ease-out"
-    aria-hidden="true"
-  >
-    <div class="p-4 space-y-5">
-      <!-- Suburb Selector -->
-      <div class="mb-3">
-        <label for="suburb-selector-mobile" class="block text-sm font-medium text-gray-700 mb-1">Your Area:</label>
-        <div class="relative">
-          <select 
-            id="suburb-selector-mobile" 
-            class="appearance-none w-full bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-fresh-sky focus:border-transparent"
-          >
-            {suburbs.map(s => <option value={s.name}>{s.name}</option>)}
+  <!-- Mobile Menu (hidden by default) -->
+  <div id="mobile-menu" class="lg:hidden hidden bg-[#0c2f5a] text-white shadow-lg">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      <!-- Location Section for Mobile -->
+      <div class="flex flex-col gap-2 p-3 bg-light-sky/90 rounded-lg mb-2">
+        <div class="flex items-center gap-2 text-gray-800">
+          <svg class="w-5 h-5 text-fresh-sky flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span id="mobile-current-suburb-display">
+            Serving <span id="mobile-current-suburb" class="font-semibold text-deep-navy">{DEFAULT_SUBURB_DISPLAY}</span>
+          </span>
+        </div>
+        <div class="suburb-selector relative">
+          <select id="suburb-selector-mobile" aria-label="Select your suburb (mobile)" class="w-full appearance-none bg-white pl-3 pr-8 py-2 text-gray-700 cursor-pointer focus:outline-none border border-gray-300 rounded-lg">
+            {suburbs.map((suburb) => (
+              <option value={suburb.name}>{suburb.name}</option>
+            ))}
           </select>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-fresh-sky">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,154 +157,59 @@ const defaultSuburb = "Redbank Plains";
           </div>
         </div>
       </div>
-      
+
       <!-- Navigation Links -->
-      <div class="grid grid-cols-2 gap-3">
-        <a href="/#difference" class="py-3 px-4 text-center bg-light-sky text-deep-navy font-medium rounded-lg transition-colors hover:bg-fresh-sky hover:text-white">The Difference</a>
-        <a href="/#services" class="py-3 px-4 text-center bg-light-sky text-deep-navy font-medium rounded-lg transition-colors hover:bg-fresh-sky hover:text-white">Services</a>
-        <a href="/#about" class="py-3 px-4 text-center bg-light-sky text-deep-navy font-medium rounded-lg transition-colors hover:bg-fresh-sky hover:text-white">About Us</a>
-        <a href="/#locations" class="py-3 px-4 text-center bg-light-sky text-deep-navy font-medium rounded-lg transition-colors hover:bg-fresh-sky hover:text-white">Service Area</a>
-      </div>
-      
-      <!-- Contact Buttons -->
-      <div class="border-t border-gray-200 pt-4 space-y-3">
-        <a href="/#quote" class="block bg-fresh-sky hover:bg-deep-navy text-white text-center font-bold py-3 rounded-lg transition-colors">Get Free Quote</a>
-        <a href="tel:0405779420" class="flex items-center justify-center py-3 bg-gray-100 text-deep-navy font-bold rounded-lg transition-colors hover:bg-gray-200">
-          <svg class="w-5 h-5 mr-2 text-fresh-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          0405 779 420
-        </a>
-      </div>
+      <a href="/#difference" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-fresh-sky/30 focus:bg-fresh-sky/30 transition">The Difference</a>
+      <a href="/#services" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-fresh-sky/30 focus:bg-fresh-sky/30 transition">Services</a>
+      <a href="/#about" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-fresh-sky/30 focus:bg-fresh-sky/30 transition">About Us</a>
+      <!-- CTA Button -->
+      <a href="#quote" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-fresh-sky hover:bg-deep-navy text-center mt-2 transition">Get a Quote</a>
     </div>
   </div>
 </header>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    const defaultSuburb = "Redbank Plains";
-    const desktopSelector = document.getElementById('suburb-selector-desktop');
-    const mobileSelector = document.getElementById('suburb-selector-mobile');
-    const placeholders = document.querySelectorAll('.suburb-placeholder');
-    const menuBtn = document.getElementById('menu-btn');
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.getElementById('mobile-menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
     const openIcon = document.getElementById('menu-icon-open');
     const closeIcon = document.getElementById('menu-icon-close');
-    
-    // Function to sanitize input
-    const sanitizeForStorage = (str) => {
-      return str ? String(str).replace(/[^a-zA-Z0-9\s-]/g, '') : '';
-    };
 
-    // Function to update suburb display
-    const updateSuburbDisplay = (suburbName) => {
-      const name = suburbName || defaultSuburb;
-      const sanitizedName = sanitizeForStorage(name);
-      
-      placeholders.forEach(el => { 
-        el.textContent = sanitizedName; 
-      });
-      
-      if (desktopSelector) desktopSelector.value = sanitizedName;
-      if (mobileSelector) mobileSelector.value = sanitizedName;
-      
-      localStorage.setItem('preferredSuburb', sanitizedName);
-      document.dispatchEvent(new CustomEvent('suburbChanged', { detail: { name: sanitizedName } }));
-    };
-
-    // Function to toggle mobile menu
-    const toggleMenu = (shouldOpen) => {
-      if (!menuBtn || !mobileMenu || !openIcon || !closeIcon) return;
-      
-      const isOpen = shouldOpen ?? (menuBtn.getAttribute('aria-expanded') === 'true');
-      
-      // Update ARIA attributes
-      menuBtn.setAttribute('aria-expanded', String(!isOpen));
-      mobileMenu.setAttribute('aria-hidden', String(isOpen));
-      
-      // Toggle icons
-      openIcon.classList.toggle('hidden', !isOpen);
-      closeIcon.classList.toggle('hidden', isOpen);
-      
-      // Toggle menu with animation
-      mobileMenu.classList.toggle('hidden', isOpen);
-      mobileMenu.style.maxHeight = isOpen ? '0' : '500px';
-      
-      // Prevent body scrolling when menu is open
-      document.body.style.overflow = isOpen ? '' : 'hidden';
-    };
-
-    // Initialize from localStorage
-    const savedSuburb = localStorage.getItem('preferredSuburb');
-    updateSuburbDisplay(savedSuburb);
-
-    // Add event listeners
-    if (desktopSelector) {
-      desktopSelector.addEventListener('change', (e) => {
-        updateSuburbDisplay(e.target.value);
-      });
+    function openMenu() {
+      mobileMenu.classList.remove('hidden');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      openIcon.classList.add('hidden');
+      closeIcon.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     }
-    
-    if (mobileSelector) {
-      mobileSelector.addEventListener('change', (e) => {
-        updateSuburbDisplay(e.target.value);
-        toggleMenu(true); // Close menu after selection
-      });
+    function closeMenu() {
+      mobileMenu.classList.add('hidden');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      openIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
-    
-    if (menuBtn) {
-      menuBtn.addEventListener('click', () => {
-        toggleMenu();
-      });
-      
-      // Close menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target) && !mobileMenu.classList.contains('hidden')) {
-          toggleMenu(true);
-        }
-      });
-    }
-    
-    // Close menu on ESC key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
-        toggleMenu(true);
-      }
+
+    menuToggle.addEventListener('click', () => {
+      if (mobileMenu.classList.contains('hidden')) openMenu();
+      else closeMenu();
     });
+
+    // Optional: close on Esc key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) closeMenu();
+    });
+
+    // Suburb selectors stay in sync
+    const desktopSelector = document.getElementById('suburb-selector-desktop');
+    const mobileSelector = document.getElementById('suburb-selector-mobile');
+    function handleSuburbChange(event) {
+      const val = event.target.value;
+      if (desktopSelector && desktopSelector.value !== val) desktopSelector.value = val;
+      if (mobileSelector && mobileSelector.value !== val) mobileSelector.value = val;
+      window.dispatchEvent(new CustomEvent('suburbChanged', { detail: { name: val } }));
+    }
+    if (desktopSelector) desktopSelector.addEventListener('change', handleSuburbChange);
+    if (mobileSelector) mobileSelector.addEventListener('change', handleSuburbChange);
   });
 </script>
-
-<style>
-  /* Smooth transitions */
-  .suburb-selector-control {
-    transition: all 0.2s ease;
-  }
-  
-  .suburb-selector-control:focus {
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
-    outline: none;
-  }
-  
-  /* Hover effects for navigation links */
-  nav a:hover {
-    color: #0ea5e9;
-  }
-  
-  /* Mobile menu animation */
-  #mobile-menu {
-    transition: max-height 0.4s ease-out, opacity 0.3s ease;
-  }
-  
-  /* Ensure proper spacing on mobile */
-  @media (max-width: 1023px) {
-    #mobile-menu {
-      position: fixed;
-      top: 80px;
-      left: 0;
-      right: 0;
-      z-index: 40;
-      overflow-y: auto;
-      max-height: calc(100vh - 80px);
-    }
-  }
-</style>

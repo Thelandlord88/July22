@@ -80,7 +80,7 @@
   }
 }
 
-/* --- Utilities Layer: Special-case styles --- */
+/* --- Utilities Layer: Special-case styles and CTA effects --- */
 @layer utilities {
   /* Focus state for forced-colors mode (high contrast) */
   @media (forced-colors: active) {
@@ -89,5 +89,84 @@
       outline-offset: 2px;
     }
     /* Expand for other controls as needed */
+  }
+
+  /* --- Advanced CTA Pulse Effects --- */
+
+  /* 1. Soft Glowing Animated Ring Pulse */
+  .cta-pulse {
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+  }
+  .cta-pulse::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%; height: 120%;
+    border-radius: 9999px;
+    background: rgba(14, 165, 233, 0.16);
+    z-index: -1;
+    opacity: 0.9;
+    animation: ring-pulse 1.8s cubic-bezier(0.4,0,0.6,1) infinite;
+    pointer-events: none;
+  }
+  @keyframes ring-pulse {
+    0% {
+      opacity: 0.6;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    60% {
+      opacity: 0.0;
+      transform: translate(-50%, -50%) scale(1.32);
+    }
+    100% {
+      opacity: 0.0;
+      transform: translate(-50%, -50%) scale(1.5);
+    }
+  }
+
+  /* 2. Inner Glow + Outer Pulse Hybrid */
+  .cta-glow-pulse {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 12px 2px rgba(14,165,233,0.25), 0 2px 8px rgba(12,47,90,0.13);
+    transition: box-shadow 0.2s;
+  }
+  .cta-glow-pulse::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%; height: 120%;
+    border-radius: 9999px;
+    background: rgba(14, 165, 233, 0.16);
+    z-index: -1;
+    opacity: 0.9;
+    animation: ring-pulse 1.7s cubic-bezier(0.4,0,0.6,1) infinite;
+    pointer-events: none;
+  }
+  /* Uses the same ring-pulse keyframes as above */
+
+  /* 3. Animated Gradient Shine */
+  .cta-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-shine::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 70%);
+    animation: shine-slide 2.5s infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+  @keyframes shine-slide {
+    0% { left: -75%; }
+    80% { left: 110%; }
+    100% { left: 110%; }
   }
 }

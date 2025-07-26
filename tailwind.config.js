@@ -14,9 +14,7 @@ module.exports = {
         'light-gray': '#f8fafc',
         'accent-yellow': '#F59E0B',
         'red-error': '#ef4444',
-        
-        // REFINED: Instead of redefining the gray scale, we alias Tailwind's default 'gray' palette.
-        // This is more maintainable and follows the DRY principle.
+        // Alias Tailwind's default gray palette
         'gray-warm': colors.gray,
       },
       fontFamily: {
@@ -48,6 +46,18 @@ module.exports = {
         pulse: {
           '50%': { opacity: .5 },
         },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-12px)' },
+        },
+        'float-fast': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-24px)' },
+        },
+        'float-medium': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-18px)' },
+        },
       },
       animation: {
         sweep: 'sweep 0.3s ease-in-out forwards',
@@ -55,6 +65,9 @@ module.exports = {
         slideUp: 'slideUp 0.5s ease-out',
         lift: 'lift 8s ease-in-out infinite',
         'pulse-once': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) 1',
+        'float-slow': 'float-slow 5s ease-in-out infinite',
+        'float-fast': 'float-fast 3s ease-in-out infinite',
+        'float-medium': 'float-medium 4s ease-in-out infinite',
       },
     },
   },

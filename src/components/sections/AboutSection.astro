@@ -3,29 +3,67 @@
 import { Image } from 'astro:assets';
 import teamImage from '../../assets/images/usdown.webp';
 ---
-<section id="about" class="bg-white py-20 md:py-28">
-    <div class="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-12">
-       <div class="lg:w-1/2">
-           <Image 
-               src={teamImage} 
-               alt="Trent and Pandora from One N Done Bond Clean, a local family team." 
-               class="rounded-2xl shadow-xl w-full object-cover" 
-               style="aspect-ratio: 4/3;" 
-               loading="lazy" 
-               width="1024"
-               formats={['avif', 'webp']}
-               decoding="async"
-           />
-       </div>
-       <div class="lg:w-1/2 text-center lg:text-left">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-deep-navy">Meet Trent & Pandora</h2>
-            <p class="mt-6 text-lg text-gray-600">
-                "Hi, we're the team behind One N Done Bond Clean! I'm Trent, and my four-legged boss is Pandora. As a local, family-owned business from <span class="suburb-placeholder font-semibold">Redbank Plains</span>, we pour our hearts into every job. We’re not about rushing through a checklist; we’re about providing an honest, reliable service that makes your life easier."
-            </p>
-            <div class="mt-8 bg-sky-50 p-6 rounded-2xl border-l-4 border-fresh-sky">
-                <h4 class="font-bold text-lg text-deep-navy">Our Promise:</h4>
-                <p class="mt-2 text-gray-700">"To treat your home with respect, to communicate clearly, and to guarantee our work, every single time."</p>
-            </div>
-       </div>
+
+<style>
+  :root {
+    --color-fresh-sky: #0ea5e9;
+    --color-deep-navy: #0c2f5a;
+  }
+</style>
+
+<section
+  id="about"
+  class="py-20 md:py-28"
+  style="
+    background: linear-gradient(
+      to top,
+      var(--color-fresh-sky) 0%,
+      var(--color-deep-navy) 100%
+    );
+  "
+>
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <!-- IMAGE COLUMN -->
+      <div class="flex flex-col items-center md:items-start">
+        <Image 
+          src={teamImage}
+          alt="Trent and Pandora from One N Done Bond Clean, a local family team."
+          class="rounded-2xl shadow-xl w-full max-w-md object-cover"
+          style="aspect-ratio: 4/3;"
+          loading="lazy"
+          width="600"
+          formats={['avif', 'webp']}
+          decoding="async"
+        />
+        <div class="flex items-center mt-6 gap-3 bg-white/70 rounded-xl px-4 py-3 shadow">
+          <span class="text-2xl">🐾</span>
+          <span class="text-blue-800 font-semibold">Pandora: Quality Control Expert</span>
+        </div>
+      </div>
+      <!-- TEXT COLUMN -->
+      <div class="flex flex-col gap-8 items-center md:items-start text-center md:text-left">
+        <div>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4 drop-shadow">Meet Trent & Pandora</h2>
+          <p class="text-lg text-white/90">
+            "Hi, we're the team behind One N Done Bond Clean! I'm Trent, and my four-legged boss is Pandora.
+            As a local, family-owned business from
+            <span class="suburb-placeholder font-semibold text-white underline underline-offset-2 decoration-fresh-sky">Redbank Plains</span>,
+            we pour our hearts into every job. We’re not about rushing through a checklist; we’re about providing an honest, reliable service that makes your life easier."
+          </p>
+        </div>
+
+        <!-- ICON CIRCLE BADGE CARD -->
+        <div class="relative bg-white p-6 rounded-2xl shadow-lg border border-sky-100 mt-6 w-full max-w-md mx-auto">
+          <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-[var(--color-fresh-sky)] text-white w-12 h-12 flex items-center justify-center rounded-full shadow border-4 border-white text-2xl">
+            🏅
+          </div>
+          <h4 class="font-bold text-lg text-[var(--color-deep-navy)] mt-6 mb-1 text-center">Our Promise:</h4>
+          <p class="text-gray-700 text-center">
+            "To treat your home with respect, to communicate clearly, and to guarantee our work, every single time."
+          </p>
+        </div>
+      </div>
     </div>
+  </div>
 </section>

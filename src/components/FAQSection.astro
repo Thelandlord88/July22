@@ -1,45 +1,329 @@
 ---
-import FAQItem from './FAQItem.astro';
+// src/components/FAQSection.astro
+// FINAL VALIDATED & CORRECTED CODE
+// This component renders an accessible, animated FAQ accordion with embedded schema.
+// It expects an array of FAQ objects via the `faqData` prop.
+// Each FAQ object should have `q` (question) and `a` (answer) properties.
+// The answer can contain basic HTML (e.g., <strong>, <p>).
 
-const faqData = [
-  { q: "What is your 100% Bond Back Guarantee?", a: "If your property manager finds any issue, we return free within 72 h to fix it." },
-  { q: "Is the price on my quote final?", a: "Yes, unless the condition is materially different — we’ll always confirm first." },
-  { q: "What’s included in a standard bond clean?", a: "Kitchen, bathrooms, walls, floors, windows (interior & tracks) — full checklist supplied." },
-  { q: "Add-on services?", a: "Carpet steam cleaning & wall washing are popular extras selectable in the form." },
-  { q: "Do I need to be present?", a: "No. Just leave keys in a lockbox; ensure power, hot water, and empty premises." },
-  { q: "Are you insured?", a: "Yes — $10 M public liability." },
-  { q: "How do I book?", a: "Complete the 60-second quote form or call 0405 779 420." }
-];
+import type { HTMLAttributes } from 'astro/types';
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqData.map((item, i) => ({
-    "@type": "Question",
-    "@id": `q${i + 1}`,
-    "name": item.q,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": item.a
-    }
-  }))
-};
+// Define the expected shape of a single FAQ item for type safety.
+interface FAQItem {
+  q: string; // Question text
+  a: string; // Answer text (can include HTML)
+}
+
+// Define the component's props. It expects an array of FAQ items.
+export interface Props extends HTMLAttributes<'div'> {
+  faqData: FAQItem[];
+}
+
+// Destructure the props passed to the component.
+const { faqData } = Astro.props;
 ---
 
-<section id="faq" class="py-20 bg-light-gray">
-  <div class="container mx-auto px-6">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-deep-navy">Frequently Asked Questions</h2>
-    </div>
-
-    <div class="max-w-3xl mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md">
-      {faqData.map((item, i) => (
-        <div id={`q${i + 1}`}>
-          <FAQItem question={item.q} answer={item.a} />
+<!-- 
+  FAQPage Schema Container:
+  Wraps the entire section to define it as an FAQPage for search engines.
+  Uses itemscope and itemtype for structured data.
+-->
+<div itemscope itemtype="https://schema.org/FAQPage" class="faq-section-container">
+  <!-- Optional: Add a headline for the section -->
+  <h2 class="faq-headline">Frequently Asked Questions</h2>
+  
+  <!-- Wrapper for styling the FAQ cards -->
+  <div class="faq-wrapper">
+    <!-- Loop through each FAQ item provided via the faqData prop -->
+    {faqData.map((faq, index) => (
+      <!-- 
+        Question Schema Container:
+        Each FAQ item is wrapped in a container that defines it as a Question entity.
+        itemprop="mainEntity" links it to the FAQPage.
+      -->
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" class="faq-item" id={`faq-item-${index}`}>
+        
+        <!-- 
+          Question Button:
+          A semantic <button> element that acts as the clickable header for each FAQ.
+          - aria-expanded: Indicates if the answer is currently visible (managed by JS).
+          - aria-controls: Points to the ID of the answer container for accessibility.
+        -->
+        <button 
+          type="button" 
+          class="faq-question" 
+          aria-expanded="false" 
+          aria-controls={`faq-answer-${index}`}
+        >
+          <!-- 
+            Question Text:
+            Displays the question text and marks it as the name of the Question entity.
+            itemprop="name" links it to the Question schema.
+          -->
+          <span itemprop="name" class="faq-question-text">{faq.q}</span>
+          
+          <!-- 
+            Chevron Icon:
+            An inline SVG icon that visually indicates the expand/collapse state.
+            Its rotation is controlled by CSS based on the button's aria-expanded state.
+            aria-hidden="true" hides it from screen readers as it's decorative.
+          -->
+          <svg 
+            class="faq-icon" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg" 
+            aria-hidden="true"
+          >
+            <path 
+              d="M6 9L12 15L18 9" 
+              stroke="currentColor" 
+              stroke-width="2" 
+              stroke-linecap="round" 
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        
+        <!-- 
+          Answer Schema Container:
+          Wraps the answer content and defines it as an Answer entity linked to the Question.
+          - itemprop="acceptedAnswer" links it to the Question.
+          - itemtype="https://schema.org/Answer" defines its schema type.
+          - id: Unique ID used by aria-controls and JavaScript.
+          - class: For styling and JavaScript targeting.
+          - hidden: Initially hides the answer content.
+        -->
+        <div 
+          itemscope 
+          itemprop="acceptedAnswer" 
+          itemtype="https://schema.org/Answer" 
+          id={`faq-answer-${index}`} 
+          class="faq-answer-wrapper" 
+          hidden
+        >
+          <!-- 
+            Answer Text Container:
+            Holds the actual answer text and marks it as the text of the Answer entity.
+            itemprop="text" links it to the Answer schema.
+            set:html={faq.a}: Renders the answer string as HTML, allowing for basic formatting.
+                            Crucial for rendering HTML tags like <strong> within the answer.
+          -->
+          <div itemprop="text" class="faq-answer" set:html={faq.a} />
         </div>
-      ))}
-    </div>
+      </div>
+    ))}
   </div>
-</section>
+</div>
 
-<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<!-- Scoped Styles for the FAQ Component -->
+<style>
+  /* Base Styles */
+  .faq-section-container {
+    width: 100%;
+    max-width: 800px; /* Adjust maximum width as needed */
+    margin: 4rem auto; /* Center the section and add vertical space */
+    padding: 0 1rem; /* Add horizontal padding for smaller screens */
+    font-family: var(--font-sans, sans-serif); /* Use your site's font stack */
+    color: #333; /* Default text color */
+  }
+
+  /* Optional Headline Styling */
+  .faq-headline {
+    text-align: center;
+    font-size: 2rem; /* 32px */
+    font-weight: 700; /* Bold */
+    margin-bottom: 2rem; /* Space below the headline */
+    color: #111827; /* Darker color for contrast */
+  }
+
+  /* Wrapper for the FAQ cards */
+  .faq-wrapper {
+    background-color: #fff; /* White background for the cards */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+    overflow: hidden; /* Ensures rounded corners clip inner content */
+    border: 1px solid #e5e7eb; /* Light border */
+  }
+
+  /* Individual FAQ Item */
+  .faq-item {
+    border-bottom: 1px solid #e5e7eb; /* Divider line between items */
+  }
+
+  /* Remove border on the last item */
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+
+  /* FAQ Question Button */
+  .faq-question {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Push text left, icon right */
+    align-items: center; /* Vertically center items */
+    width: 100%; /* Full width button */
+    padding: 1.5rem; /* Generous padding */
+    background-color: transparent; /* No background by default */
+    border: none; /* Remove default button border */
+    cursor: pointer; /* Indicate it's clickable */
+    text-align: left; /* Left-align text */
+    font-size: 1.125rem; /* Slightly larger font size */
+    font-weight: 600; /* Semi-bold font weight */
+    color: inherit; /* Inherit text color */
+    transition: background-color 0.2s ease; /* Smooth background transition on hover */
+  }
+
+  /* Hover and Focus States for Question Button */
+  .faq-question:hover,
+  .faq-question:focus-visible {
+    background-color: #f9fafb; /* Light background on hover/focus */
+  }
+
+  /* Specific focus style for keyboard accessibility */
+  .faq-question:focus-visible {
+    outline: 2px solid #4f46e5; /* Custom focus outline */
+    outline-offset: -2px; /* Adjust outline position */
+  }
+
+  /* Styling for the question text */
+  .faq-question-text {
+    flex-grow: 1; /* Allow text to take up available space */
+    margin-right: 1rem; /* Space between text and icon */
+    line-height: 1.4; /* Improve readability */
+  }
+
+  /* Styling for the chevron icon */
+  .faq-icon {
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    transition: transform 0.3s ease; /* Smooth rotation transition */
+    color: #4f46e5; /* Icon color (can match your brand) */
+  }
+
+  /* Rotate icon when question is expanded */
+  /* Uses the aria-expanded attribute for state management */
+  .faq-question[aria-expanded="true"] .faq-icon {
+    transform: rotate(180deg); /* Rotate 180 degrees */
+  }
+
+  /* FAQ Answer Wrapper */
+  /* This container handles the animated expand/collapse */
+  .faq-answer-wrapper {
+    max-height: 0; /* Initially collapsed */
+    overflow: hidden; /* Hide content that exceeds max-height */
+    /* 
+      Smooth transition for max-height.
+      cubic-bezier provides a nice easing effect.
+    */
+    transition: max-height 0.4s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    background-color: #f9fafb; /* Slightly different background for answers */
+  }
+
+  /* FAQ Answer Content */
+  .faq-answer {
+    padding: 1.5rem; /* Padding inside the answer */
+    padding-top: 0; /* Less padding at the top */
+    font-size: 1rem; /* Standard font size */
+    line-height: 1.6; /* Good line height for readability */
+    color: #4b5563; /* Slightly lighter text color for answers */
+  }
+
+  /* Basic styling for paragraphs within the answer */
+  .faq-answer p {
+    margin: 0 0 1rem 0; /* Bottom margin for paragraphs */
+  }
+
+  /* Remove margin on the last paragraph */
+  .faq-answer p:last-child {
+    margin-bottom: 0;
+  }
+</style>
+
+<!-- Client-Side JavaScript for Interactivity -->
+<script>
+  /**
+   * FaqAccordion Class
+   * Manages the behavior of an FAQ accordion section.
+   * Handles click events, toggles visibility, and updates ARIA attributes.
+   */
+  class FaqAccordion {
+    /**
+     * Constructor
+     * @param {HTMLElement} containerEl - The root element of the FAQ section.
+     */
+    constructor(containerEl) {
+      this.container = containerEl;
+      // Exit if no container is provided
+      if (!this.container) return;
+
+      // Find all question buttons within this container
+      this.questions = this.container.querySelectorAll('.faq-question');
+      // Initialize event listeners
+      this.init();
+    }
+
+    /**
+     * Initializes the accordion by attaching event listeners.
+     */
+    init() {
+      // Loop through each question button
+      this.questions.forEach(question => {
+        // Add a click event listener to each button
+        question.addEventListener('click', () => this.toggle(question));
+      });
+    }
+
+    /**
+     * Toggles the visibility of an FAQ answer.
+     * @param {HTMLButtonElement} question - The clicked question button.
+     */
+    toggle(question) {
+      // Get the current expanded state from the aria-expanded attribute
+      const isExpanded = question.getAttribute('aria-expanded') === 'true';
+      
+      // Get the ID of the answer container this button controls
+      const answerId = question.getAttribute('aria-controls');
+      
+      // Find the answer wrapper element by its ID
+      const answerWrapper = document.getElementById(answerId);
+
+      // Exit if the answer wrapper element is not found
+      if (!answerWrapper) return;
+
+      // --- Update State and UI ---
+
+      // 1. Toggle the aria-expanded attribute on the button
+      question.setAttribute('aria-expanded', String(!isExpanded));
+
+      // 2. Show or hide the answer content
+      if (isExpanded) {
+        // --- Collapsing ---
+        // Set the hidden attribute for accessibility
+        answerWrapper.setAttribute('hidden', '');
+        // Reset max-height to trigger the collapse transition
+        answerWrapper.style.maxHeight = null;
+      } else {
+        // --- Expanding ---
+        // Remove the hidden attribute
+        answerWrapper.removeAttribute('hidden');
+        // Calculate the full height of the answer content
+        const scrollHeight = answerWrapper.scrollHeight;
+        // Set max-height to the calculated height to trigger the expand transition
+        answerWrapper.style.maxHeight = `${scrollHeight}px`;
+      }
+    }
+  }
+
+  // --- Initialize All FAQ Sections on the Page ---
+  // Wait for the DOM to be fully loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Find all FAQ section containers on the page
+    const faqContainers = document.querySelectorAll('.faq-section-container');
+    
+    // Loop through each container and initialize a new FaqAccordion instance
+    faqContainers.forEach(container => {
+      new FaqAccordion(container);
+    });
+  });
+</script>

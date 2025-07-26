@@ -1,18 +1,39 @@
-/images/*
-  Cache-Control: public, max-age=31536000
+# ===================================================================
+# NETLIFY EDGE HEADERS - PRODUCTION CONFIGURATION
+# ===================================================================
+# This file configures critical HTTP response headers for security,
+# performance, and clarity on the Netlify edge. These headers are
+# applied globally to all responses unless overridden.
 
-/js/*
-  Cache-Control: public, max-age=31536000
+# -------------------------------------------------------------------
+# Enforce Permanent HTTPS
+# Instructs browsers to only use HTTPS for this site, now and in the future.
+# Includes subdomains and signals intent for HSTS preload lists.
+# -------------------------------------------------------------------
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 
-/css/*
-  Cache-Control: public, max-age=31536000
-
-# Versioned assets (e.g., app.123456.js, style.abcdef.css)
-/js/*.*.js
+# -------------------------------------------------------------------
+# Immutable Caching for Static Assets
+# Tells the browser that files in /assets/ never change.
+# They are cached for 1 year, significantly speeding up repeat visits.
+# -------------------------------------------------------------------
+/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-/css/*.*.css
-  Cache-Control: public, max-age=31536000, immutable
+# -------------------------------------------------------------------
+# Content Security Policy (CSP)
+# Defines allowed resource sources to prevent XSS and injection attacks.
+# Strict policy suitable for a minimal/no-JS Astro site.
+# Optional: report-uri added to monitor violations.
+# -------------------------------------------------------------------
+/*
+  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' ; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; report-uri https://onendonebondclean.com.au/functions/csp-report
 
-/images/*.*.*
-  Cache-Control: public, max-age=31536000, immutable
+# -------------------------------------------------------------------
+# Permissions Policy
+# Disables access to browser features not required by the site.
+# Enhances security and privacy by blocking unused device sensors/apis.
+# -------------------------------------------------------------------
+/*
+  Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(), camera=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), speaker=(), sync-xhr=(), usb=(), vr=()

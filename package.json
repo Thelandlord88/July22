@@ -7,10 +7,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro build && npm run validate:schema",
     "preview": "astro preview",
     "test": "jest",
-    "test:data": "node scripts/validate-data.js"
+    "test:data": "node scripts/validate-data.js",
+    "validate:schema": "node ./scripts/validate-schema.js"
   },
   "keywords": [],
   "author": "",
@@ -28,8 +29,8 @@
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.8.3"
   },
-"overrides": {
-  "esbuild": "^0.25.8"
+  "overrides": {
+    "esbuild": "^0.25.8"
   },
   "dependencies": {
     "@astrojs/netlify": "^6.4.1",

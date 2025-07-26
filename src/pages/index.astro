@@ -1,5 +1,5 @@
 ---
-// src/pages/index.astro
+// src/pages/index.astro - REWRITTEN
 
 // --- LAYOUT ---
 import MainLayout from '~/layouts/MainLayout.astro';
@@ -8,29 +8,53 @@ import MainLayout from '~/layouts/MainLayout.astro';
 import HeroSection from '~/components/sections/HeroSection.astro';
 import AboutSection from '~/components/sections/AboutSection.astro';
 import DifferenceSection from '~/components/sections/DifferenceSection.astro';
-import FAQSection from '~/components/FAQSection.astro';
+import FAQSection from '~/components/FAQSection.astro'; // This is our target component
 import QuoteForm from '~/components/QuoteForm.astro';
 import ContactSection from '~/components/sections/ContactSection.astro';
-import SparkleWipeDivider from '~/components/SparkleWipeDivider.astro';
 import Polaroids from '~/components/Polaroid.astro';
 import slugify from '~/utils/slugify.js';
 
 // --- DATA & UTILITIES ---
+// Note: We no longer need generateSchema here, as Schema.astro handles it.
 import { suburbs } from '~/utils/geoHandler.js';
-import { generateSchema } from '~/utils/schema.js';
 
 // --- PAGE LOGIC ---
 const pageTitle = "One N Done | Expert Bond Cleaning in Ipswich & Surrounding Suburbs";
 const pageDescription = "Professional bond cleaning services for Redbank Plains, Springfield Lakes, Ipswich, and more. Get your bond back guaranteed.";
 
 const homepageSuburb = suburbs.find(s => s.name === "Redbank Plains") || suburbs[0];
-const schemaString = generateSchema(homepageSuburb, suburbs);
+
+// --- AMMUNITION FOR THE FAQ COMPONENT ---
+// This is the data we will pass to our refactored FAQSection component.
+// It is specific to the homepage.
+const homePageFAQs = [
+  { 
+    q: "What is your 100% Bond Back Guarantee?", 
+    a: "It's our commitment to you. If your real estate agent finds any issue with our clean related to our checklist, we will return to rectify it free of charge within 72 hours. We work with you to ensure your bond is returned." 
+  },
+  { 
+    q: "Is the price on my quote final?", 
+    a: "Yes, the price is fixed for the details you provide. The only time a price may change is if the property's condition is significantly different from described (e.g., more rooms, extreme soiling). We will ALWAYS discuss and confirm any changes with you before starting extra work." 
+  },
+  {
+    q: "Do you service areas outside of Ipswich?",
+    a: "Absolutely. While we are based in the Ipswich region, we proudly service many surrounding areas, including Springfield Lakes, Brisbane's western suburbs, and more. Check our service area list or contact us to confirm your location."
+  },
+  {
+    q: "What's included in a standard bond clean?",
+    a: "A standard bond clean is a comprehensive, top-to-bottom clean of the entire property, following a detailed checklist approved by real estate agencies. This includes everything from ovens and light fittings to skirting boards and windows. We also offer carpet cleaning and pest control as separate services."
+  }
+];
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
   
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={schemaString}></script>
+    <!-- 
+      REMOVED: The old manual schema script. 
+      This is now handled globally and dynamically by our superior Schema.astro component,
+      preventing conflicts and ensuring a single source of truth.
+    -->
     <link rel="canonical" href="https://onendonebondclean.com.au/" />
   </Fragment>
 
@@ -38,9 +62,7 @@ const schemaString = generateSchema(homepageSuburb, suburbs);
     
     <HeroSection />
     
- 
-      <AboutSection suburb={homepageSuburb} />
-  
+    <AboutSection suburb={homepageSuburb} />
 
     <DifferenceSection />
 
@@ -62,10 +84,15 @@ const schemaString = generateSchema(homepageSuburb, suburbs);
       </div>
     </section>
 
-    {/* 2. Replaced the old GallerySection with the new Polaroids component */}
     <Polaroids />
     
-    <FAQSection />
+    <!-- 
+      CORRECTED IMPLEMENTATION:
+      We are now calling the FAQSection component and passing our homepage-specific
+      FAQ data into it via the `faqData` prop. This resolves the build error.
+    -->
+    <FAQSection faqData={homePageFAQs} />
+
     <ContactSection />
     <QuoteForm />
 

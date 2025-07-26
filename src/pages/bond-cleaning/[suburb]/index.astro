@@ -1,25 +1,22 @@
 ---
-// src/pages/bond-cleaning/[suburb]/index.astro
+// src/pages/bond-cleaning/[suburb]/index.astro - REWRITTEN
 
 // --- LAYOUTS, COMPONENTS, & UTILITIES ---
 import MainLayout from '~/layouts/MainLayout.astro';
 import { Image } from 'astro:assets';
-import { suburbs as allSuburbs } from '~/utils/geoHandler.js'; // Use an alias for clarity
-import { generateSchema } from '~/utils/schema.js';
+import { suburbs as allSuburbs } from '~/utils/geoHandler.js';
 import slugify from '~/utils/slugify.js';
+import FAQSection from '~/components/FAQSection.astro'; // Import our new weapon
+import QuoteForm from '~/components/QuoteForm.astro';
 
 // --- SERVER-SIDE PAGE GENERATION ---
-
 export function getStaticPaths() {
   const heroImages = import.meta.glob('/src/assets/images/suburbs/*.{jpg,jpeg,png,webp}');
   const allImagePaths = Object.keys(heroImages);
 
   return allSuburbs.map(suburb => {
     const slug = slugify(suburb.name);
-
-    const imagePathKey = allImagePaths.find(
-      (path) => path.includes(`/${slug}-hero.`)
-    );
+    const imagePathKey = allImagePaths.find(path => path.includes(`/${slug}-hero.`));
 
     if (!imagePathKey) {
       throw new Error(`Hero image not found for slug "${slug}" in /src/assets/images/suburbs/`);
@@ -27,7 +24,7 @@ export function getStaticPaths() {
 
     return {
       params: { suburb: slug },
-      props: { 
+      props: {
         suburb: suburb,
         heroImage: heroImages[imagePathKey]()
       },
@@ -40,18 +37,36 @@ const { suburb, heroImage } = Astro.props;
 // --- PAGE-SPECIFIC METADATA & SCHEMA ---
 const pageTitle = `${suburb.name} Bond Cleaning | 100% Bond Back Guarantee`;
 const pageDescription = `Your local ${suburb.name} (${suburb.postcode}) bond cleaning specialists.`;
-// CORRECT: Pass the specific `suburb` object to generate a targeted schema.
-const schemaString = generateSchema(suburb, allSuburbs);
+
+// --- DYNAMIC FAQ CONTENT ---
+// We generate questions and answers specific to the suburb for this page.
+// This makes the content highly relevant for SEO.
+const suburbSpecificFAQs = [
+    {
+        q: `Do you provide bond cleaning services in ${suburb.name}?`,
+        a: `Yes, absolutely. ${suburb.name} is one of our primary service areas. We have teams available and are familiar with the local real estate standards.`
+    },
+    {
+        q: `How much does a bond clean cost in ${suburb.name}?`,
+        a: `The cost depends on the size and condition of your property. We offer a free, no-obligation quote tailored to your specific home in ${suburb.name}. Just fill out our quote form for a fixed price.`
+    },
+    {
+        q: "How long does a bond clean take?",
+        a: "A typical bond clean can take anywhere from 4 to 8 hours. We send a team of two or more professional cleaners to ensure the job is done efficiently and to the highest standard."
+    },
+    {
+        q: "What if my agent isn't happy with the clean?",
+        a: `Our 100% Bond Back Guarantee has you covered. If there are any issues on the cleaning checklist, contact us within 72 hours, and we will return to rectify them for free. Our goal is to ensure a smooth bond return for you in ${suburb.name}.`
+    }
+];
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
   
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={schemaString}></script>
     <link rel="canonical" href={`https://onendonebondclean.com.au/bond-cleaning/${slugify(suburb.name)}/`} />
   </Fragment>
 
-  <!-- Hero Section with Dynamic Image -->
   <section class="relative bg-deep-navy text-white text-center py-20">
       <div class="absolute inset-0 opacity-20">
           <Image 
@@ -72,16 +87,21 @@ const schemaString = generateSchema(suburb, allSuburbs);
     <div class="container mx-auto px-6 text-center">
       <h2 class="text-2xl font-bold">Why Choose Us for Your {suburb.name} Clean?</h2>
       <p class="mt-2 text-gray-warm-700 max-w-2xl mx-auto">
-        We are your local experts, familiar with the area and properties near landmarks like {suburb.landmarks.join(' and ')}.
+        We are your local experts, familiar with the real estate agents and properties in ${suburb.name}${suburb.landmarks.length > 0 ? `, often working near landmarks like ${suburb.landmarks.join(' and ')}` : ''}.
       </p>
     </div>
   </section>
 
-  <!-- You could add more sections here, like the QuoteForm or a suburb-specific checklist link -->
-  <!-- 
-    <section class="py-16 bg-light-gray">
-      <QuoteForm client:visible />
-    </section>
-  -->
+  <FAQSection faqData={suburbSpecificFAQs} />
+
+  <section class="py-16 bg-light-gray">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-deep-navy">Get Your Free, No-Obligation Quote</h2>
+            <p class="text-lg text-gray-warm-700 mt-2">Enter your details below for a fixed price on your {suburb.name} bond clean.</p>
+        </div>
+        <QuoteForm />
+    </div>
+  </section>
 
 </MainLayout>

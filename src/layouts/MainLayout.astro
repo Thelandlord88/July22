@@ -1,61 +1,103 @@
 ---
 // src/layouts/MainLayout.astro
+/**
+ * MainLayout.astro
+ *
+ * This is the primary layout component for the website.
+ * It provides a consistent structure including header, main content area, and footer.
+ * It handles essential SEO meta tags and provides slots for pages to inject custom head content
+ * and main content. It no longer contains hardcoded schema, delegating that responsibility
+ * to individual pages or components (like Schema.astro) via the 'head' slot.
+ *
+ * Props:
+ * - title (string): The page title.
+ * - description (string): The page meta description.
+ */
 
 // --- INTERFACE ---
-// CORRECTED: The layout no longer needs to know about the schema. It's truly generic.
 export interface Props {
+  /**
+   * The title of the page. This will be used in the <title> tag and og:title.
+   */
   title: string;
+  /**
+   * The meta description of the page. Used in the meta description tag and og:description.
+   */
   description: string;
 }
 
+// Destructure the props passed to the layout.
 const { title, description } = Astro.props;
 
 // --- COMPONENTS & DATA ---
+// Import shared components used across the site.
 import Header from '~/components/Header.astro';
 import Footer from '~/components/Footer.astro';
-import { suburbs } from '~/utils/geoHandler.js'; 
+
+// Import utility data needed by child components (e.g., Header).
+import { suburbs } from '~/utils/geoHandler.js';
 
 // --- ASTRO FEATURES ---
+// Enable View Transitions for smooth navigation between pages.
 import { ViewTransitions } from 'astro:transitions';
 
-// CORRECTED: Import the global stylesheet directly for Astro's bundler to process.
+// --- GLOBAL STYLES ---
+// Import the main stylesheet. Astro will process and bundle this.
 import '~/styles/input.css';
 ---
 
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
+    <!-- Essential Meta Tags -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Generator meta tag (useful for debugging Astro version) -->
     <meta name="generator" content={Astro.generator} />
-    
+
+    <!-- Primary SEO Meta Tags -->
     <title>{title}</title>
     <meta name="description" content={description} />
 
-    <!-- SEO Meta Tags -->
+    <!-- Open Graph / Social Media Meta Tags -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL('/images/og.jpg', Astro.site)} />
+    <meta property="og:type" content="website" />
+    <!-- It's good practice to have an og:image, adjust path as needed -->
+    <meta property="og:image" content={new URL('/images/og.jpg', Astro.site).href} />
+    <!-- Ensure Astro.site is correctly configured in astro.config.mjs -->
 
-    <!-- REMOVED: The hardcoded schema script is gone. -->
-
-    <!-- ADDED: A named slot. Any page can now inject content into the <head>. -->
+    <!-- 
+      Named slot for pages to inject additional elements into the <head>.
+      This is crucial for:
+      - Page-specific canonical links
+      - Page-specific structured data (e.g., Schema.astro component)
+      - Page-specific styles or scripts
+    -->
     <slot name="head" />
 
+    <!-- Enable Astro's client-side View Transitions -->
     <ViewTransitions />
   </head>
   <body class="bg-light-gray font-sans text-gray-warm-800">
-    
-    <!-- The layout passes the necessary suburbs data down to the Header. -->
+    <!-- 
+      Render the Header component.
+      Pass the static 'suburbs' data down so the Header can use it for navigation or display.
+    -->
     <Header suburbs={suburbs} />
 
+    <!-- Main content area of the page -->
     <main>
-      <!-- The default slot where all main page content will be rendered. -->
+      <!-- 
+        Default slot for the main content of the page.
+        Whatever is placed between the opening and closing tags of this layout
+        in a page file will be rendered here.
+      -->
       <slot />
     </main>
 
+    <!-- Render the Footer component -->
     <Footer />
-    
   </body>
 </html>

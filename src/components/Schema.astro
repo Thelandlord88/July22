@@ -1,51 +1,50 @@
 ---
-// src/components/Schema.astro
-import { generateSchema } from '../utils/schema.js';
-import { suburbs } from '../utils/geoHandler.js';
+// Phase 1: Core Structured Data Refinement
+// This frontmatter executes on the server at build time.
 
-// Generate a default schema on the server for initial load and crawlers.
-const initialSchema = generateSchema({ name: "Redbank Plains" }, suburbs);
+import { generateSchema } from '../utils/schema.js';
+import suburbs from '../data/suburbs.json';
+
+// 1. Set a default preferred suburb. This ensures a valid schema is always ready for SSR.
+const preferredSuburb = "Redbank Plains"; // Or any other sensible default
+
+// 2. Find the data for the default suburb.
+const initialSuburbData = suburbs.find(s => s.name === preferredSuburb) || {
+  name: preferredSuburb,
+  coords: {},
+  postcode: '',
+  landmarks: []
+};
+
+// 3. Generate the initial, server-rendered schema. This is critical for crawlers.
+const initialSchema = generateSchema(initialSuburbData, suburbs);
 ---
 
 <script type="application/ld+json" set:html={initialSchema} id="dynamic-schema"></script>
 
 <script>
+  /**
+   * Listens for the 'astro:page-load' event, which fires on initial page view
+   * and every subsequent page navigation. This is the correct Astro lifecycle event for this task.
+   */
   document.addEventListener('astro:page-load', () => {
-    if (typeof window !== 'undefined') {
-      const schemaScript = document.getElementById('dynamic-schema');
-      
-      Promise.all([
-        import('../utils/schema.js'),
-        // CORRECTED: Import the correctly named client-side function.
-        import('../utils/geoHandler.js') 
-      ]).then(([{ generateSchema }, { loadSuburbDataClient }]) => {
+    // Dynamically import the schemaManager only when the page is ready.
+    // This is called "code-splitting" and is excellent for performance.
+    import('../utils/schemaManager.js').then(({ initializeSchema }) => {
+      initializeSchema();
+    });
+  });
 
-        const updateDisplay = async (suburbName) => {
-          if (!schemaScript) return;
-          try {
-            // CORRECTED: Call the correctly named function.
-            const allSuburbs = await loadSuburbDataClient(); 
-            const suburbData = allSuburbs.find(s => s.name === suburbName) || { name: suburbName, coords: {}, postcode: '', landmarks: [] };
-            
-            setTimeout(() => {
-              schemaScript.textContent = generateSchema(suburbData, allSuburbs);
-            }, 300);
-
-          } catch (e) {
-            console.error('Schema generation error:', e);
-            if (typeof gtag === 'function') {
-              gtag('event', 'exception', { 'description': `Schema_Error: ${e.message}`, 'fatal': false });
-            }
-          }
-        };
-
-        const preferredSuburb = localStorage.getItem('preferredSuburb') || "Redbank Plains";
-        updateDisplay(preferredSuburb);
-
-        document.addEventListener('suburbChanged', (e) => {
-          updateDisplay(e.detail.name);
-        });
-      });
-    }
+  /**
+   * Listens for a custom 'suburbChanged' event.
+   * This allows other components on the page to trigger a schema update
+   * without being tightly coupled to this one.
+   */
+  document.addEventListener('suburbChanged', (e) => {
+    // We only import and run the update function when a suburb actually changes.
+    import('../utils/schemaManager.js').then(({ updateSchemaForSuburb }) => {
+      // The new suburb name is passed in the event's 'detail' object.
+      updateSchemaForSuburb(e.detail.name);
+    });
   });
 </script>
