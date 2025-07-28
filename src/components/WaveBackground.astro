@@ -1,9 +1,23 @@
 ---
 // src/components/WaveBackground.astro
 ---
+<script>
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const wave1 = document.querySelector('.wave-1');
+      const wave2 = document.querySelector('.wave-2');
+
+      if (wave1 && wave2) {
+        wave1.style.transform = `translateY(${scrollY * 0.1}px) translateX(0)`;
+        wave2.style.transform = `translateY(${scrollY * 0.2}px) translateX(0)`;
+      }
+    });
+  }
+</script>
 
 <div class="organic-wave-container">
-  <div class="bubbles">
+  <div class="bubbles" aria-hidden="true">
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
@@ -15,17 +29,19 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
   </div>
-  <svg class="wave wave-1" viewBox="0 0 1440 320" preserveAspectRatio="none">
+
+  <svg class="wave wave-1" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
     <defs>
       <linearGradient id="wave-gradient" x1="0.5" y1="0" x2="0.5" y2="1">
         <stop offset="0%" stop-color="var(--color-fresh-sky)" />
         <stop offset="100%" stop-color="var(--color-deep-navy)" />
       </linearGradient>
     </defs>
-    <path d="M0,160L48,181.3C96,203,192,245,288,250.7C384,256,480,224,576,197.3C672,171,768,149,864,165.3C960,181,1056,235,1152,240C1248,245,1344,203,1392,181.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+    <path d="M0,160L48,181.3C96,203,192,245,288,250.7C384,256,480,224,576,197.3C672,171,768,149,864,165.3C960,181,1056,235,1152,240C1248,245,1344,203,1392,181.3L1440,160L1440,320L0,320Z" />
   </svg>
-  <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none">
-    <path d="M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,213.3C840,203,960,149,1080,138.7C1200,128,1320,160,1380,176L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+
+  <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,213.3C840,203,960,149,1080,138.7C1200,128,1320,160,1380,176L1440,192L1440,320L0,320Z" />
   </svg>
 </div>
 
@@ -33,6 +49,7 @@
   :root {
     --color-fresh-sky: #0ea5e9;
     --color-deep-navy: #0c2f5a;
+    --bubble-color: rgba(255, 255, 255, 0.2);
   }
 
   .organic-wave-container {
@@ -43,6 +60,7 @@
     height: 100%;
     z-index: 0;
     overflow: hidden;
+    pointer-events: none;
   }
 
   .wave {
@@ -52,6 +70,8 @@
     width: 200%;
     height: clamp(100px, 20vw, 220px);
     fill: url(#wave-gradient);
+    mix-blend-mode: screen;
+    will-change: transform;
   }
 
   .wave-1 {
@@ -80,23 +100,26 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    mix-blend-mode: screen;
   }
 
   .bubble {
     position: absolute;
     bottom: -50px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--bubble-color);
     border-radius: 50%;
-    animation: rise 20s infinite;
+    animation: rise 20s infinite ease-in-out;
+    will-change: transform, opacity;
   }
 
   @keyframes rise {
     0% {
       transform: translateY(0) scale(1);
-      opacity: 1;
+      opacity: 0.9;
     }
-    90% {
-      opacity: 1;
+    60% {
+      transform: translateY(-50vh) scale(1.1);
+      opacity: 0.6;
     }
     100% {
       transform: translateY(-100vh) scale(0.3);

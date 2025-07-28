@@ -1,5 +1,5 @@
 ---
-// src/pages/index.astro - REWRITTEN
+// src/pages/index.astro
 
 // --- LAYOUT ---
 import MainLayout from '~/layouts/MainLayout.astro';
@@ -12,10 +12,10 @@ import FAQSection from '~/components/FAQSection.astro'; // This is our target co
 import QuoteForm from '~/components/QuoteForm.astro';
 import ContactSection from '~/components/sections/ContactSection.astro';
 import Polaroids from '~/components/Polaroid.astro';
+import SparkleWipeDivider from '~/components/SparkleWipeDivider.astro';
 import slugify from '~/utils/slugify.js';
 
 // --- DATA & UTILITIES ---
-// Note: We no longer need generateSchema here, as Schema.astro handles it.
 import { suburbs } from '~/utils/geoHandler.js';
 
 // --- PAGE LOGIC ---
@@ -25,8 +25,6 @@ const pageDescription = "Professional bond cleaning services for Redbank Plains,
 const homepageSuburb = suburbs.find(s => s.name === "Redbank Plains") || suburbs[0];
 
 // --- AMMUNITION FOR THE FAQ COMPONENT ---
-// This is the data we will pass to our refactored FAQSection component.
-// It is specific to the homepage.
 const homePageFAQs = [
   { 
     q: "What is your 100% Bond Back Guarantee?", 
@@ -50,20 +48,16 @@ const homePageFAQs = [
 <MainLayout title={pageTitle} description={pageDescription}>
   
   <Fragment slot="head">
-    <!-- 
-      REMOVED: The old manual schema script. 
-      This is now handled globally and dynamically by our superior Schema.astro component,
-      preventing conflicts and ensuring a single source of truth.
-    -->
     <link rel="canonical" href="https://onendonebondclean.com.au/" />
   </Fragment>
 
   <main class="text-gray-warm-800">
     
     <HeroSection />
-    
+  <section class="relative bg-gradient-to-b from-fresh-sky to-deep-navy pb-0">
     <AboutSection suburb={homepageSuburb} />
-
+</section>
+  <Polaroids />
     <DifferenceSection />
 
     <section class="py-16 bg-light-gray" id="service-areas">
@@ -82,15 +76,8 @@ const homePageFAQs = [
           ))}
         </ul>
       </div>
-    </section>
-
-    <Polaroids />
-    
-    <!-- 
-      CORRECTED IMPLEMENTATION:
-      We are now calling the FAQSection component and passing our homepage-specific
-      FAQ data into it via the `faqData` prop. This resolves the build error.
-    -->
+    </section>    
+    <!-- FAQSection with homePageFAQs data -->
     <FAQSection faqData={homePageFAQs} />
 
     <ContactSection />
