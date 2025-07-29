@@ -1,119 +1,193 @@
 ---
-// This is the definitive, production-ready version of the Quote Form component.
-// It resolves all previously identified issues, including:
-// 1. Astro's View Transition lifecycle bugs ("unresponsive buttons").
-// 2. Fragile state management logic.
-// 3. Incomplete form reset behavior.
-// This implementation is robust, maintainable, and user-friendly.
+/**
+ * QuoteForm.astro – Multi‑step quote request form
+ * ------------------------------------------------
+ * • Starts progress bar at 25 % (step / totalSteps)
+ * • Keyboard‑accessible add‑on cards (uses :has & JS fallback)
+ * • Netlify‑compatible async submission with offline retry
+ * • Strict AU phone validation
+ * • Smooth reset scroll + focus safety‑net
+ * • Clear comment markers so you can extend ‑‑ e.g. STEP 2 add‑on list
+ */
 ---
 <section id="quote" class="py-20 md:py-28 bg-gradient-to-br from-light-sky to-sky-200">
   <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-    <!-- Form Area: Contains the entire multi-step form -->
+    <!-- ──────────────────── FORM AREA ───────────────────── -->
     <div id="form-area">
+      <!-- Header + Progress bar -->
       <div class="p-6 md:p-8">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-deep-navy text-center mb-4">Get Your Guaranteed Quote</h2>
-        <p class="text-center text-gray-600 mb-8">Fill in the details below for a transparent, no-surprise price.</p>
-        <div class="progress-bar mb-2"><div class="progress-fill" id="progress" style="width: 0%;"></div></div>
-        <div class="text-sm text-slate-500 text-right">Step <span id="current-step-display">1</span> of 4</div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-deep-navy text-center mb-4">
+          Get Your Guaranteed Quote
+        </h2>
+        <p class="text-center text-gray-600 mb-8">
+          Fill in the details below for a transparent, no‑surprise price.
+        </p>
+        <div class="progress-bar mb-2">
+          <div id="progress" class="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="text-sm text-slate-500 text-right">
+          Step <span id="current-step-display">1</span> of 4
+        </div>
       </div>
-      <!-- Step Indicators -->
+
+      <!-- Step indicators (desktop visual guide) -->
       <div class="step-indicator px-8 py-4">
         <div class="step active" data-step="1"><div class="step-number">1</div><div class="step-label">Property</div></div>
-        <div class="step" data-step="2"><div class="step-number">2</div><div class="step-label">Add-ons</div></div>
+        <div class="step" data-step="2"><div class="step-number">2</div><div class="step-label">Add‑ons</div></div>
         <div class="step" data-step="3"><div class="step-number">3</div><div class="step-label">Your Info</div></div>
         <div class="step" data-step="4"><div class="step-number">4</div><div class="step-label">Review</div></div>
       </div>
+
+      <!-- Inline form submission error (shown if fetch fails) -->
+      <div id="form-submission-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mx-6 md:mx-8 mt-4" role="alert">
+        <strong class="font-bold">Submission failed.</strong>
+        <span id="form-submission-error-msg" class="block sm:inline"></span>
+      </div>
+
+      <!-- ──────────────────── FORM START ─────────────────── -->
       <div class="px-6 md:px-8 pb-8">
-        <!-- Form Submission Error Message Area -->
-        <div id="form-submission-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
-          <strong class="font-bold">Submission Failed.</strong>
-          <span class="block sm:inline" id="form-submission-error-msg"></span>
-        </div>
-        <form id="quote-form" name="quote-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
-          <p class="hidden"><label>Don’t fill this out if you’re human: <input name="bot-field" /></label></p>
-          
-          <!-- STEP 1: Property -->
-          <div class="form-step active" id="step-1">
+        <form id="quote-form"
+              name="quote-request"
+              method="POST"
+              data-netlify="true"
+              netlify-honeypot="bot-field"
+              novalidate>
+          <!-- Netlify spam trap -->
+          <p class="hidden"><label>Don’t fill this out if you’re human: <input name="bot-field"></label></p>
+
+          <!-- ─────── STEP 1: Property details ─────── -->
+          <div id="step-1" class="form-step active">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">About Your Property</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-slate-700 font-medium mb-2" for="property-type">Property Type</label>
-                <select id="property-type" name="property-type" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-fresh-sky" required aria-describedby="property-type-error-msg"><option value="">Select...</option><option value="House">House</option><option value="Apartment">Apartment</option><option value="Townhouse">Townhouse</option></select>
+                <label for="property-type" class="block text-slate-700 font-medium mb-2">Property Type</label>
+                <select id="property-type" name="property-type" required aria-describedby="property-type-error-msg"
+                        class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-fresh-sky">
+                  <option value="">Select.</option>
+                  <option>House</option><option>Apartment</option><option>Townhouse</option>
+                </select>
                 <p id="property-type-error-msg" class="error-message" hidden>Please select a property type.</p>
               </div>
               <div>
-                <label class="block text-slate-700 font-medium mb-2" for="bedrooms">Bedrooms</label>
-                <select id="bedrooms" name="bedrooms" class="w-full p-3 border border-slate-300 rounded-lg"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select>
+                <label for="bedrooms" class="block text-slate-700 font-medium mb-2">Bedrooms</label>
+                <select id="bedrooms" name="bedrooms" class="w-full p-3 border border-slate-300 rounded-lg">
+                  <option>1</option><option>2</option><option selected>3</option><option>4</option>
+                </select>
               </div>
               <div class="md:col-span-2">
-                <label class="block text-slate-700 font-medium mb-2" for="bathrooms">Bathrooms</label>
-                <select id="bathrooms" name="bathrooms" class="w-full p-3 border border-slate-300 rounded-lg"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select>
+                <label for="bathrooms" class="block text-slate-700 font-medium mb-2">Bathrooms</label>
+                <select id="bathrooms" name="bathrooms" class="w-full p-3 border border-slate-300 rounded-lg">
+                  <option>1</option><option selected>2</option><option>3</option>
+                </select>
               </div>
             </div>
             <div class="flex justify-end mt-8">
-              <button type="button" class="next-step bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i></button>
+              <button type="button" class="next-step bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">
+                Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i>
+              </button>
             </div>
           </div>
 
-          <!-- STEP 2: Add-ons -->
-          <div class="form-step" id="step-2">
+          <!-- ─────── STEP 2: Add‑ons ─────── -->
+          <div id="step-2" class="form-step">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">Customise Your Clean</h3>
+            <!-- TODO: 🔧 Add more selectable cards here as the business scales -->
             <div class="space-y-4">
-              <label class="form-checkbox-label flex items-center p-4 border border-gray-300 rounded-lg hover:bg-light-sky transition cursor-pointer"><input type="checkbox" name="addons" value="Interior Wall Wash" class="h-5 w-5 text-fresh-sky"><span class="ml-4 font-medium">Interior Wall Wash</span></label>
-              <label class="form-checkbox-label flex items-center p-4 border border-gray-300 rounded-lg hover:bg-light-sky transition cursor-pointer"><input type="checkbox" name="addons" value="Carpet Steam Clean" class="h-5 w-5 text-fresh-sky"><span class="ml-4 font-medium">Carpet Steam Clean</span></label>
+              <label class="form-checkbox-label flex items-center p-4 border border-gray-300 rounded-lg hover:bg-light-sky transition cursor-pointer">
+                <input type="checkbox" name="addons" value="Interior Wall Wash" class="h-5 w-5 text-fresh-sky">
+                <span class="ml-4 font-medium">Interior Wall Wash</span>
+              </label>
+              <label class="form-checkbox-label flex items-center p-4 border border-gray-300 rounded-lg hover:bg-light-sky transition cursor-pointer">
+                <input type="checkbox" name="addons" value="Carpet Steam Clean" class="h-5 w-5 text-fresh-sky">
+                <span class="ml-4 font-medium">Carpet Steam Clean</span>
+              </label>
             </div>
             <div class="flex justify-between mt-8">
-              <button type="button" class="prev-step bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-slate-400"><i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> Back</button>
-              <button type="button" class="next-step bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i></button>
+              <button type="button" class="prev-step bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-slate-400">
+                <i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> Back
+              </button>
+              <button type="button" class="next-step bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">
+                Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i>
+              </button>
             </div>
           </div>
 
-          <!-- STEP 3: Your Info -->
-          <div class="form-step" id="step-3">
+          <!-- ─────── STEP 3: Contact info ─────── -->
+          <div id="step-3" class="form-step">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">Your Information</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div><label class="block text-slate-700 font-medium mb-2" for="full-name">Full Name</label><input type="text" id="full-name" name="full-name" class="w-full p-3 border border-slate-300 rounded-lg" required placeholder="John Doe" aria-describedby="full-name-error-msg"><p id="full-name-error-msg" class="error-message" hidden>Please enter your full name.</p></div>
-              <div><label class="block text-slate-700 font-medium mb-2" for="phone">Phone Number</label><input type="tel" id="phone" name="phone" class="w-full p-3 border border-slate-300 rounded-lg" required placeholder="0412 345 678" aria-describedby="phone-error-msg"><p id="phone-error-msg" class="error-message" hidden>Please enter a valid phone number.</p></div>
-              <div class="md:col-span-2"><label class="block text-slate-700 font-medium mb-2" for="email">Email Address</label><input type="email" id="email" name="email" class="w-full p-3 border border-slate-300 rounded-lg" required placeholder="you@email.com" aria-describedby="email-error-msg"><p id="email-error-msg" class="error-message" hidden>Please enter a valid email address.</p></div>
+              <div>
+                <label for="full-name" class="block text-slate-700 font-medium mb-2">Full Name</label>
+                <input id="full-name" name="full-name" type="text" required placeholder="John Doe"
+                       class="w-full p-3 border border-slate-300 rounded-lg" aria-describedby="full-name-error-msg">
+                <p id="full-name-error-msg" class="error-message" hidden>Please enter your full name.</p>
+              </div>
+              <div>
+                <label for="phone" class="block text-slate-700 font-medium mb-2">Phone Number</label>
+                <input id="phone" name="phone" type="tel" required placeholder="0412 345 678"
+                       class="w-full p-3 border border-slate-300 rounded-lg" aria-describedby="phone-error-msg">
+                <p id="phone-error-msg" class="error-message" hidden>Please enter a valid Australian phone number.</p>
+              </div>
+              <div class="md:col-span-2">
+                <label for="email" class="block text-slate-700 font-medium mb-2">Email Address</label>
+                <input id="email" name="email" type="email" required placeholder="you@email.com"
+                       class="w-full p-3 border border-slate-300 rounded-lg" aria-describedby="email-error-msg">
+                <p id="email-error-msg" class="error-message" hidden>Please enter a valid email address.</p>
+              </div>
             </div>
             <div class="flex justify-between mt-8">
-              <button type="button" class="prev-step bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-slate-400"><i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> Back</button>
-              <button type="button" class="next-step bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i></button>
+              <button type="button" class="prev-step bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-slate-400">
+                <i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> Back
+              </button>
+              <button type="button" class="next-step bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">
+                Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i>
+              </button>
             </div>
           </div>
 
-          <!-- STEP 4: Review -->
-          <div class="form-step" id="step-4">
+          <!-- ─────── STEP 4: Review & Submit ─────── -->
+          <div id="step-4" class="form-step">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">Review Your Request</h3>
             <div class="bg-slate-50 rounded-xl p-6 mb-6 space-y-3">
-              <div class="summary-item flex justify-between items-center"><span class="text-slate-600">Property:</span><span class="font-bold text-right text-deep-navy" id="review-property-summary">-</span></div>
-              <div class="summary-item"><span class="text-slate-600">Services:</span><ul class="font-bold mt-2 list-disc list-inside text-fresh-sky" id="review-services"></ul></div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-600">Property:</span>
+                <span id="review-property-summary" class="font-bold text-right text-deep-navy">-</span>
+              </div>
+              <div>
+                <span class="text-slate-600">Services:</span>
+                <ul id="review-services" class="font-bold mt-2 list-disc list-inside text-fresh-sky"></ul>
+              </div>
             </div>
             <div class="flex justify-between mt-8">
-              <button type="button" class="prev-step bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-slate-400"><i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> Back</button>
+              <button type="button" class="prev-step bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-lg focus-visible:ring-4 focus-visible:ring-slate-400">
+                <i class="fas fa-arrow-left mr-2" aria-hidden="true"></i> Back
+              </button>
               <button type="submit" id="submit-btn" class="bg-green-700 hover:bg-green-800 text-white font-extrabold py-3 px-8 rounded-lg focus-visible:ring-4 focus-visible:ring-green-300 disabled:opacity-50 disabled:cursor-wait">
                 <span class="submit-text">Submit Quote Request</span>
-                <span class="loading-spinner hidden">
-                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  Submitting...
-                </span>
+                <span class="loading-spinner hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg> Submitting…</span>
               </button>
             </div>
           </div>
         </form>
       </div>
     </div>
-    <!-- Success Message -->
+
+    <!-- ──────────────────── SUCCESS AREA ─────────────────── -->
     <div id="success-message" class="hidden text-center py-20 px-4">
-      <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-4 ring-white shadow-lg"><i class="fas fa-check-circle text-green-700 text-5xl" aria-hidden="true"></i></div>
-      <h2 class="text-3xl font-bold text-deep-navy mb-4">Success! We'll be in touch.</h2>
-      <button id="new-quote-btn" class="bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-8 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">Request Another Quote</button>
+      <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-4 ring-white shadow-lg">
+        <i class="fas fa-check-circle text-green-700 text-5xl" aria-hidden="true"></i>
+      </div>
+      <h2 class="text-3xl font-bold text-deep-navy mb-4">Success! We’ll be in touch.</h2>
+      <button id="new-quote-btn" class="bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-8 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">
+        Request Another Quote
+      </button>
     </div>
   </div>
 </section>
 
 <script lang="ts">
-  interface IQuoteFormState {
+  /* --------------------------- STATE TYPES ---------------------------- */
+  interface QuoteFormState {
     currentStep: number;
     propertyType: string;
     bedrooms: string;
@@ -123,105 +197,119 @@
     phone: string;
     email: string;
   }
-  
-  function trackEvent(eventName: string, properties: object = {}) {
-    console.log(`ANALYTICS: ${eventName}`, properties);
-  }
 
+  /* --------------------------- INIT HANDLER --------------------------- */
   function initQuoteForm() {
-    const form = document.getElementById('quote-form') as HTMLFormElement;
-    if (!form) return;
-    if (form.dataset.initialized === 'true') return;
+    const form = document.getElementById('quote-form') as HTMLFormElement | null;
+    if (!form || form.dataset.initialized === 'true') return;
     form.dataset.initialized = 'true';
 
-    const formArea = document.getElementById('form-area');
-    const successMessage = document.getElementById('success-message');
-    const formSteps = Array.from(form.querySelectorAll('.form-step')) as HTMLElement[];
-    const stepIndicators = Array.from(document.querySelectorAll('.step-indicator .step')) as HTMLElement[];
-    const progressBar = document.getElementById('progress') as HTMLElement;
-    const currentStepDisplay = document.getElementById('current-step-display');
-    const newQuoteBtn = document.getElementById('new-quote-btn');
-    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-    const formSubmissionError = document.getElementById('form-submission-error');
-    
-    const initialState: IQuoteFormState = {
-      currentStep: 1,
-      propertyType: form.querySelector<HTMLSelectElement>('#property-type')?.value || '',
-      bedrooms: form.querySelector<HTMLSelectElement>('#bedrooms')?.value || '3',
-      bathrooms: form.querySelector<HTMLSelectElement>('#bathrooms')?.value || '2',
-      addons: [],
-      fullName: '',
-      phone: '',
-      email: '',
-    };
-    let state: IQuoteFormState = { ...initialState };
+    /* DOM refs */
+    const formArea           = document.getElementById('form-area');
+    const successArea        = document.getElementById('success-message');
+    const formSteps          = Array.from(form.querySelectorAll<HTMLElement>('.form-step'));
+    const indicators         = Array.from(document.querySelectorAll<HTMLElement>('.step-indicator .step'));
+    const progressFill       = document.getElementById('progress') as HTMLElement;
+    const stepDisplay        = document.getElementById('current-step-display');
+    const newQuoteBtn        = document.getElementById('new-quote-btn');
+    const submitBtn          = document.getElementById('submit-btn') as HTMLButtonElement;
+    const errorBanner        = document.getElementById('form-submission-error');
 
+    /* Initial state (defaults align with markup) */
+    const initialState: QuoteFormState = {
+      currentStep : 1,
+      propertyType: (form.querySelector('#property-type') as HTMLSelectElement).value || '',
+      bedrooms    : (form.querySelector('#bedrooms') as HTMLSelectElement).value || '3',
+      bathrooms   : (form.querySelector('#bathrooms') as HTMLSelectElement).value || '2',
+      addons      : [],
+      fullName    : '',
+      phone       : '',
+      email       : ''
+    };
+    let state: QuoteFormState = { ...initialState };
+
+    /* ---------- Helper: UI Render ---------- */
     const renderUI = () => {
-        if(progressBar) progressBar.style.width = `${((state.currentStep - 1) / (formSteps.length)) * 100}%`;
-        if(currentStepDisplay) currentStepDisplay.textContent = String(state.currentStep);
-        stepIndicators.forEach((indicator, index) => {
-            indicator.classList.remove('active', 'completed');
-            if (index + 1 < state.currentStep) indicator.classList.add('completed');
-            if (index + 1 === state.currentStep) indicator.classList.add('active');
-        });
-        formSteps.forEach((stepEl) => stepEl.classList.toggle('active', Number(stepEl.id.split('-')[1]) === state.currentStep));
-        if (state.currentStep === 4) {
-            document.getElementById('review-property-summary')!.textContent = `${state.bedrooms} Bed, ${state.bathrooms} Bath ${state.propertyType || 'Property'}`;
-            const servicesList = document.getElementById('review-services')!;
-            servicesList.innerHTML = '<li>Standard Bond Clean</li>';
-            state.addons.forEach(addon => servicesList.insertAdjacentHTML('beforeend', `<li>${addon}</li>`));
-        }
+      // progress bar width (current / total)
+      progressFill.style.width = `${(state.currentStep / formSteps.length) * 100}%`;
+      stepDisplay!.textContent = String(state.currentStep);
+
+      indicators.forEach((el, i) => {
+        el.classList.toggle('active',   i + 1 === state.currentStep);
+        el.classList.toggle('completed', i + 1 <  state.currentStep);
+      });
+      formSteps.forEach((el, i) => el.classList.toggle('active', i + 1 === state.currentStep));
+
+      if (state.currentStep === 4) {
+        // summary content
+        (document.getElementById('review-property-summary')!).textContent = `${state.bedrooms} Bed, ${state.bathrooms} Bath ${state.propertyType || 'Property'}`;
+        const list = document.getElementById('review-services')!;
+        list.innerHTML = '<li>Standard Bond Clean</li>';
+        state.addons.forEach(a => list.insertAdjacentHTML('beforeend', `<li>${a}</li>`));
+      }
     };
 
-    const validateAndToggleError = (inputEl: HTMLInputElement | HTMLSelectElement, isValid: boolean) => {
-        const errorMsg = document.getElementById(inputEl.getAttribute('aria-describedby')!);
-        inputEl.classList.toggle('invalid', !isValid);
-        inputEl.setAttribute('aria-invalid', String(!isValid));
-        if (errorMsg) errorMsg.hidden = isValid;
+    /* ---------- Helper: validation ---------- */
+    const toggleInvalid = (input: HTMLElement, isValid: boolean) => {
+      const msg = document.getElementById(input.getAttribute('aria-describedby')!);
+      input.classList.toggle('invalid', !isValid);
+      input.setAttribute('aria-invalid', String(!isValid));
+      if (msg) msg.hidden = isValid;
     };
 
     const validateStep = (step: number): boolean => {
-      let allValid = true;
+      let ok = true;
       if (step === 1) {
-          const propTypeInput = form.querySelector<HTMLSelectElement>('#property-type')!;
-          const isPropTypeValid = state.propertyType.trim() !== '';
-          validateAndToggleError(propTypeInput, isPropTypeValid);
-          allValid = isPropTypeValid;
+        const sel = form.querySelector('#property-type') as HTMLSelectElement;
+        ok = sel.value.trim() !== '';
+        toggleInvalid(sel, ok);
       } else if (step === 3) {
-          const nameInput = form.querySelector<HTMLInputElement>('#full-name')!;
-          const isNameValid = state.fullName.trim() !== '';
-          validateAndToggleError(nameInput, isNameValid);
-
-          const phoneInput = form.querySelector<HTMLInputElement>('#phone')!;
-          const isPhoneValid = /^[\d\s\-\(\)]{8,}$/.test(state.phone);
-          validateAndToggleError(phoneInput, isPhoneValid);
-
-          const emailInput = form.querySelector<HTMLInputElement>('#email')!;
-          const isEmailValid = /^\S+@\S+\.\S+$/.test(state.email);
-          validateAndToggleError(emailInput, isEmailValid);
-
-          allValid = isNameValid && isPhoneValid && isEmailValid;
+        const name = form.querySelector('#full-name') as HTMLInputElement;
+        const phone = form.querySelector('#phone') as HTMLInputElement;
+        const email = form.querySelector('#email') as HTMLInputElement;
+        const phoneRE = /^(?:\+?61\s?)?(?:\(?0?[2-578]\)?\s?\d{4}\s?\d{4})$/; // AU format
+        const emailRE = /^\S+@\S+\.\S+$/;
+        const nameOk = name.value.trim() !== '';
+        const phoneOk = phoneRE.test(phone.value);
+        const emailOk = emailRE.test(email.value);
+        toggleInvalid(name, nameOk);
+        toggleInvalid(phone, phoneOk);
+        toggleInvalid(email, emailOk);
+        ok = nameOk && phoneOk && emailOk;
       }
-      return allValid;
+      return ok;
     };
 
-    const handleFocus = () => {
-      const activeStep = formSteps[state.currentStep - 1];
-      activeStep.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      const firstInput = activeStep.querySelector('input, select, textarea') as HTMLElement;
-      if (firstInput) firstInput.focus({ preventScroll: true });
+    /* ---------- Helper: focus ---------- */
+    const focusFirst = () => {
+      const stepEl = formSteps[state.currentStep - 1];
+      stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const firstInput = stepEl.querySelector<HTMLElement>('input, select, textarea');
+      if (firstInput) {
+        firstInput.focus({ preventScroll: true });
+      } else {
+        stepEl.querySelector<HTMLElement>('.next-step, .prev-step')?.focus({ preventScroll: true });
+      }
     };
-    
+
+    /* ---------- Form submission ---------- */
+    const savePending = () => {
+      localStorage.setItem('pendingQuoteSubmission', JSON.stringify(state));
+      if (errorBanner) {
+        (document.getElementById('form-submission-error-msg')!).textContent = `We couldn't submit your quote, but we've saved your progress. We'll try again automatically when you're back online.`;
+        errorBanner.classList.remove('hidden');
+      }
+    };
+
     const submitForm = async () => {
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.querySelector('.submit-text')!.classList.add('hidden');
         submitBtn.querySelector('.loading-spinner')!.classList.remove('hidden');
       }
-      if(formSubmissionError) formSubmissionError.classList.add('hidden');
+      errorBanner?.classList.add('hidden');
 
       const body = new URLSearchParams();
-      // Use the state object as the single source of truth for submission
       body.append('form-name', 'quote-request');
       body.append('propertyType', state.propertyType);
       body.append('bedrooms', state.bedrooms);
@@ -229,19 +317,21 @@
       body.append('fullName', state.fullName);
       body.append('phone', state.phone);
       body.append('email', state.email);
-      state.addons.forEach(addon => body.append('addons[]', addon));
+      state.addons.forEach(a => body.append('addons[]', a));
 
       try {
-        const response = await fetch("/", { method: "POST", body });
-        if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
-        if(formArea) formArea.classList.add('hidden');
-        if(successMessage) successMessage.classList.remove('hidden');
+        const res = await fetch('/', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body   : body.toString()
+        });
+        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+        formArea?.classList.add('hidden');
+        successArea?.classList.remove('hidden');
         localStorage.removeItem('pendingQuoteSubmission');
-        trackEvent('form_submit_success');
-      } catch (error) {
-        console.error('Form submission failed:', error);
-        savePendingSubmission();
-        trackEvent('form_submit_error', { error: (error as Error).message });
+      } catch (err) {
+        console.error('form submit error', err);
+        savePending();
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -251,58 +341,60 @@
       }
     };
 
-    const savePendingSubmission = () => {
-      localStorage.setItem('pendingQuoteSubmission', JSON.stringify(state));
-      if(formSubmissionError) {
-        document.getElementById('form-submission-error-msg')!.textContent = "We couldn't submit your quote, but we've saved your progress. We'll try again automatically when you're back online.";
-        formSubmissionError.classList.remove('hidden');
+    /* ---------- LOCAL EVENT HANDLERS ---------- */
+
+    // Keep state in sync with inputs
+    form.addEventListener('input', e => {
+      const t = e.target as HTMLInputElement;
+      switch (t.name) {
+        case 'property-type': state.propertyType = t.value; break;
+        case 'bedrooms'     : state.bedrooms     = t.value; break;
+        case 'bathrooms'    : state.bathrooms    = t.value; break;
+        case 'full-name'    : state.fullName     = t.value; break;
+        case 'phone'        : state.phone        = t.value; break;
+        case 'email'        : state.email        = t.value; break;
+        case 'addons':
+          state.addons = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="addons"]:checked')).map(c => c.value);
+          break;
       }
-    };
-    
-    form.addEventListener('input', (e) => {
-        const target = e.target as HTMLInputElement;
-        switch(target.name) {
-            case 'property-type': state.propertyType = target.value; break;
-            case 'bedrooms': state.bedrooms = target.value; break;
-            case 'bathrooms': state.bathrooms = target.value; break;
-            case 'full-name': state.fullName = target.value; break;
-            case 'phone': state.phone = target.value; break;
-            case 'email': state.email = target.value; break;
-            case 'addons':
-                state.addons = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="addons"]:checked')).map(cb => cb.value);
-                break;
-        }
     });
 
-    form.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest('.next-step')) {
-            if (validateStep(state.currentStep)) {
-                state.currentStep++;
-                renderUI();
-                handleFocus();
-            }
-        } else if (target.closest('.prev-step')) {
-            state.currentStep--;
-            renderUI();
-            handleFocus();
-        } else if(target.closest('.form-checkbox-label')) {
-            const label = target.closest('.form-checkbox-label') as HTMLLabelElement;
-            const checkbox = label.querySelector('input[type="checkbox"]') as HTMLInputElement;
-            label.classList.toggle('selected', checkbox.checked);
+    // Click‑based navigation & checkbox card highlight (mouse users)
+    form.addEventListener('click', e => {
+      const tgt = e.target as HTMLElement;
+      if (tgt.closest('.next-step')) {
+        if (validateStep(state.currentStep)) {
+          state.currentStep++;
+          renderUI();
+          focusFirst();
         }
-    });
-    
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Validate all relevant steps before final submission
-        if (validateStep(1) && validateStep(3)) {
-            submitForm();
-        }
+      } else if (tgt.closest('.prev-step')) {
+        state.currentStep--;
+        renderUI();
+        focusFirst();
+      } else if (tgt.closest('.form-checkbox-label')) {
+        const label = tgt.closest('.form-checkbox-label') as HTMLLabelElement;
+        const cb = label.querySelector<HTMLInputElement>('input[type="checkbox"]')!;
+        label.classList.toggle('selected', cb.checked);
+      }
     });
 
-    if (newQuoteBtn) newQuoteBtn.addEventListener('click', () => form.reset());
+    // Keyboard / screen‑reader change event ensures card highlight syncs
+    form.addEventListener('change', e => {
+      const cb = (e.target as HTMLElement).closest<HTMLInputElement>('input[name="addons"]');
+      if (cb) {
+        cb.parentElement!.classList.toggle('selected', cb.checked);
+      }
+    });
 
+    // Submit handler (prevent default and validate steps 1 & 3)
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (validateStep(1) && validateStep(3)) submitForm();
+    });
+
+    // Reset handler (request another quote)
+    newQuoteBtn?.addEventListener('click', () => form.reset());
     form.addEventListener('reset', () => {
       state = { ...initialState };
       renderUI();
@@ -310,24 +402,24 @@
       form.querySelectorAll('[aria-invalid]').forEach(el => el.setAttribute('aria-invalid', 'false'));
       form.querySelectorAll('.error-message').forEach(el => (el as HTMLElement).hidden = true);
       form.querySelectorAll('.form-checkbox-label.selected').forEach(el => el.classList.remove('selected'));
-      if(formArea) formArea.classList.remove('hidden');
-      if(successMessage) successMessage.classList.add('hidden');
+      formArea?.classList.remove('hidden');
+      successArea?.classList.add('hidden');
+      form.scrollIntoView({ behavior: 'smooth' });
     });
 
-    const pendingSubmission = localStorage.getItem('pendingQuoteSubmission');
-    if (pendingSubmission) {
+    // Offline retry handling
+    const pending = localStorage.getItem('pendingQuoteSubmission');
+    if (pending) {
       try {
-        state = JSON.parse(pendingSubmission);
+        state = JSON.parse(pending);
         if (navigator.onLine) submitForm();
-      } catch (e) {
-        localStorage.removeItem('pendingQuoteSubmission');
-      }
+      } catch { localStorage.removeItem('pendingQuoteSubmission'); }
     }
-    
     window.addEventListener('online', () => {
-        if (localStorage.getItem('pendingQuoteSubmission')) submitForm();
+      if (localStorage.getItem('pendingQuoteSubmission')) submitForm();
     });
-    
+
+    // Initial paint
     renderUI();
   }
 
@@ -336,21 +428,30 @@
 </script>
 
 <style>
-.form-step { display: none; }
-.form-step.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-.progress-bar { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; }
-.progress-fill { background-color: #0ea5e9; height: 0.5rem; transition: width 0.4s ease-in-out; border-radius: 9999px; }
-.error-message { color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem; }
-input.invalid, select.invalid { border-color: #ef4444; --tw-ring-color: #ef4444; }
-.form-checkbox-label.selected { border-color: #0ea5e9; background-color: #f0f9ff; --tw-ring-color: #0ea5e9; box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow, 0 0 #0000); }
-.step-indicator { display: flex; justify-content: space-between; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
-.step { display: flex; align-items: center; padding: 0.5rem 1rem; color: #6b7280; flex-grow: 1; justify-content: center; }
-.step .step-number { width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: all 0.3s ease; }
-.step .step-label { display: none; }
-@media (min-width: 768px) { .step .step-label { display: block; margin-left: 0.75rem; font-weight: 500; } }
-.step.active .step-number { border-color: #0ea5e9; background-color: #0ea5e9; color: white; }
-.step.active { color: #0f172a; font-weight: bold; }
-.step.completed .step-number { border-color: #16a34a; background-color: #16a34a; color: white; }
-.loading-spinner.hidden, .submit-text.hidden { display: none; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* Basic transitions + states (you can migrate to Tailwind directive if preferred) */
+  .form-step{display:none}
+  .form-step.active{display:block;animation:fadeIn .5s ease-in-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .progress-bar{background:#e5e7eb;border-radius:9999px;overflow:hidden}
+  .progress-fill{background:#0ea5e9;height:0.5rem;border-radius:9999px;transition:width .4s ease-in-out}
+
+  .error-message{color:#ef4444;font-size:0.875rem;margin-top:0.5rem}
+  input.invalid,select.invalid{border-color:#ef4444;--tw-ring-color:#ef4444}
+
+  .form-checkbox-label{transition:border .2s ease,background .2s ease}
+  .form-checkbox-label.selected{border-color:#0ea5e9;background:#f0f9ff;--tw-ring-color:#0ea5e9}
+  /* CSS‑only fallback for modern browsers */
+  .form-checkbox-label:has(input:checked){border-color:#0ea5e9;background:#f0f9ff}
+
+  .step-indicator{display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+  .step{display:flex;align-items:center;padding:0.5rem 1rem;color:#6b7280;flex-grow:1;justify-content:center}
+  .step .step-number{width:2rem;height:2rem;border-radius:50%;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .3s}
+  .step .step-label{display:none}
+  @media(min-width:768px){.step .step-label{display:block;margin-left:0.75rem;font-weight:500}}
+  .step.active .step-number{border-color:#0ea5e9;background:#0ea5e9;color:#fff}
+  .step.active{color:#0f172a;font-weight:700}
+  .step.completed .step-number{border-color:#16a34a;background:#16a34a;color:#fff}
+
+  .loading-spinner.hidden,.submit-text.hidden{display:none}
 </style>
