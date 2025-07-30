@@ -56,13 +56,13 @@
           <p class="hidden"><label>Don’t fill this out if you’re human: <input name="bot-field"></label></p>
 
           <!-- ─────── STEP 1: Property details ─────── -->
-          <div id="step-1" class="form-step active">
+          <div id="step-1" class="form-step">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">About Your Property</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="property-type" class="block text-slate-700 font-medium mb-2">Property Type</label>
                 <select id="property-type" name="property-type" required aria-describedby="property-type-error-msg"
-                        class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-fresh-sky">
+                        class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-fresh-sky bg-white text-black">
                   <option value="">Select.</option>
                   <option>House</option><option>Apartment</option><option>Townhouse</option>
                 </select>
@@ -70,13 +70,13 @@
               </div>
               <div>
                 <label for="bedrooms" class="block text-slate-700 font-medium mb-2">Bedrooms</label>
-                <select id="bedrooms" name="bedrooms" class="w-full p-3 border border-slate-300 rounded-lg">
+                <select id="bedrooms" name="bedrooms" class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black">
                   <option>1</option><option>2</option><option selected>3</option><option>4</option>
                 </select>
               </div>
               <div class="md:col-span-2">
                 <label for="bathrooms" class="block text-slate-700 font-medium mb-2">Bathrooms</label>
-                <select id="bathrooms" name="bathrooms" class="w-full p-3 border border-slate-300 rounded-lg">
+                <select id="bathrooms" name="bathrooms" class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black">
                   <option>1</option><option selected>2</option><option>3</option>
                 </select>
               </div>
@@ -89,7 +89,7 @@
           </div>
 
           <!-- ─────── STEP 2: Add‑ons ─────── -->
-          <div id="step-2" class="form-step">
+          <div id="step-2" class="form-step hidden">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">Customise Your Clean</h3>
             <!-- TODO: 🔧 Add more selectable cards here as the business scales -->
             <div class="space-y-4">
@@ -113,26 +113,64 @@
           </div>
 
           <!-- ─────── STEP 3: Contact info ─────── -->
-          <div id="step-3" class="form-step">
+          <div id="step-3" class="form-step hidden">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">Your Information</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="full-name" class="block text-slate-700 font-medium mb-2">Full Name</label>
                 <input id="full-name" name="full-name" type="text" required placeholder="John Doe"
-                       class="w-full p-3 border border-slate-300 rounded-lg" aria-describedby="full-name-error-msg">
+                       class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black" aria-describedby="full-name-error-msg">
                 <p id="full-name-error-msg" class="error-message" hidden>Please enter your full name.</p>
               </div>
               <div>
-                <label for="phone" class="block text-slate-700 font-medium mb-2">Phone Number</label>
+                <label class="block text-slate-700 font-medium mb-2 relative">
+                  Phone Number
+                  <button aria-label="Why we need this" class="ml-1 text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300 peer">
+                    <i class="fas fa-question-circle"></i>
+                  </button>
+                  <!-- tooltip -->
+                  <span class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden peer-focus:block peer-hover:block bg-white text-sm text-slate-600 p-2 rounded-lg shadow-lg w-48">
+                    We only use your number for scheduling or urgent questions. No spam!
+                  </span>
+                </label>
                 <input id="phone" name="phone" type="tel" required placeholder="0412 345 678"
-                       class="w-full p-3 border border-slate-300 rounded-lg" aria-describedby="phone-error-msg">
+                       class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black" aria-describedby="phone-error-msg">
                 <p id="phone-error-msg" class="error-message" hidden>Please enter a valid Australian phone number.</p>
               </div>
               <div class="md:col-span-2">
                 <label for="email" class="block text-slate-700 font-medium mb-2">Email Address</label>
                 <input id="email" name="email" type="email" required placeholder="you@email.com"
-                       class="w-full p-3 border border-slate-300 rounded-lg" aria-describedby="email-error-msg">
+                       class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black" aria-describedby="email-error-msg">
                 <p id="email-error-msg" class="error-message" hidden>Please enter a valid email address.</p>
+              </div>
+              <!-- Address of Property -->
+              <div class="md:col-span-2">
+                <label for="property-address" class="block text-slate-700 font-medium mb-2">Address of Property</label>
+                <input id="property-address" name="property-address" type="text" required placeholder="Enter full property address"
+                       class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black" aria-describedby="property-address-error-msg">
+                <p id="property-address-error-msg" class="error-message" hidden>Please enter a property address.</p>
+              </div>
+              <!-- Preferred Service Date -->
+              <div>
+                <label for="service-date" class="block text-slate-700 font-medium mb-2">Preferred Service Date</label>
+                <div class="relative" id="calendar-root">
+                  <!-- visible, read‑only pretty version -->
+                  <input id="service-date-display" type="text" readonly placeholder="dd/mm/yyyy"
+                    class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black pr-10" aria-describedby="service-date-error-msg">
+                  <!-- hidden field sent to the server -->
+                  <input id="service-date" name="service-date" type="hidden" />
+                  <span id="calendar-trigger" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer">
+                    <i class="fas fa-calendar-alt"></i>
+                  </span>
+                </div>
+                <p id="service-date-error-msg" class="error-message" hidden>Please select a date.</p>
+              </div>
+              <!-- Special Requests -->
+              <div>
+                <label for="special-requests" class="block text-slate-700 font-medium mb-2">Special Requests</label>
+                <textarea id="special-requests" name="special-requests" rows="3"
+                  placeholder="e.g., specific areas to focus on, access instructions, etc."
+                  class="w-full p-3 border border-slate-300 rounded-lg bg-white text-black"></textarea>
               </div>
             </div>
             <div class="flex justify-between mt-8">
@@ -146,16 +184,28 @@
           </div>
 
           <!-- ─────── STEP 4: Review & Submit ─────── -->
-          <div id="step-4" class="form-step">
+          <div id="step-4" class="form-step hidden">
             <h3 class="text-2xl font-bold text-deep-navy mb-6">Review Your Request</h3>
             <div class="bg-slate-50 rounded-xl p-6 mb-6 space-y-3">
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between">
                 <span class="text-slate-600">Property:</span>
-                <span id="review-property-summary" class="font-bold text-right text-deep-navy">-</span>
+                <span id="review-property-summary" class="font-bold text-deep-navy">‑</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Address:</span>
+                <span id="review-address" class="font-medium text-deep-navy text-right break-words">‑</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Preferred Date:</span>
+                <span id="review-date" class="font-medium text-deep-navy">‑</span>
               </div>
               <div>
                 <span class="text-slate-600">Services:</span>
-                <ul id="review-services" class="font-bold mt-2 list-disc list-inside text-fresh-sky"></ul>
+                <ul id="review-services" class="mt-2 list-disc list-inside text-fresh-sky"></ul>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Special Requests:</span>
+                <span id="review-notes" class="font-medium text-deep-navy text-right break-words">‑</span>
               </div>
             </div>
             <div class="flex justify-between mt-8">
@@ -178,6 +228,7 @@
         <i class="fas fa-check-circle text-green-700 text-5xl" aria-hidden="true"></i>
       </div>
       <h2 class="text-3xl font-bold text-deep-navy mb-4">Success! We’ll be in touch.</h2>
+      <lottie-player src="/animations/checkmark.json" speed="1" style="width:96px;height:96px;margin:0 auto" autoplay keepLastFrame></lottie-player>
       <button id="new-quote-btn" class="bg-sky-700 hover:bg-sky-900 text-white font-bold py-3 px-8 rounded-lg focus-visible:ring-4 focus-visible:ring-sky-300">
         Request Another Quote
       </button>
@@ -185,48 +236,40 @@
   </div>
 </section>
 
-<script lang="ts">
-  /* --------------------------- STATE TYPES ---------------------------- */
-  interface QuoteFormState {
-    currentStep: number;
-    propertyType: string;
-    bedrooms: string;
-    bathrooms: string;
-    addons: string[];
-    fullName: string;
-    phone: string;
-    email: string;
-  }
 
+<script>
   /* --------------------------- INIT HANDLER --------------------------- */
   function initQuoteForm() {
-    const form = document.getElementById('quote-form') as HTMLFormElement | null;
+    const form = document.getElementById('quote-form');
     if (!form || form.dataset.initialized === 'true') return;
     form.dataset.initialized = 'true';
 
     /* DOM refs */
     const formArea           = document.getElementById('form-area');
     const successArea        = document.getElementById('success-message');
-    const formSteps          = Array.from(form.querySelectorAll<HTMLElement>('.form-step'));
-    const indicators         = Array.from(document.querySelectorAll<HTMLElement>('.step-indicator .step'));
-    const progressFill       = document.getElementById('progress') as HTMLElement;
+    const formSteps          = Array.from(form.querySelectorAll('.form-step'));
+    const indicators         = Array.from(document.querySelectorAll('.step-indicator .step'));
+    const progressFill       = document.getElementById('progress');
     const stepDisplay        = document.getElementById('current-step-display');
     const newQuoteBtn        = document.getElementById('new-quote-btn');
-    const submitBtn          = document.getElementById('submit-btn') as HTMLButtonElement;
+    const submitBtn          = document.getElementById('submit-btn');
     const errorBanner        = document.getElementById('form-submission-error');
 
     /* Initial state (defaults align with markup) */
-    const initialState: QuoteFormState = {
+    const initialState = {
       currentStep : 1,
-      propertyType: (form.querySelector('#property-type') as HTMLSelectElement).value || '',
-      bedrooms    : (form.querySelector('#bedrooms') as HTMLSelectElement).value || '3',
-      bathrooms   : (form.querySelector('#bathrooms') as HTMLSelectElement).value || '2',
+      propertyType: form.querySelector('#property-type').value || '',
+      bedrooms    : form.querySelector('#bedrooms').value || '3',
+      bathrooms   : form.querySelector('#bathrooms').value || '2',
       addons      : [],
       fullName    : '',
       phone       : '',
-      email       : ''
+      email       : '',
+      propertyAddress: '',
+      serviceDate: '',
+      specialRequests: ''
     };
-    let state: QuoteFormState = { ...initialState };
+    let state = { ...initialState };
 
     /* ---------- Helper: UI Render ---------- */
     const renderUI = () => {
@@ -238,44 +281,61 @@
         el.classList.toggle('active',   i + 1 === state.currentStep);
         el.classList.toggle('completed', i + 1 <  state.currentStep);
       });
-      formSteps.forEach((el, i) => el.classList.toggle('active', i + 1 === state.currentStep));
+      formSteps.forEach((el, i) => {
+        if (i + 1 === state.currentStep) {
+          el.classList.remove('hidden');
+          el.classList.add('active');
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('active');
+        }
+      });
 
       if (state.currentStep === 4) {
         // summary content
-        (document.getElementById('review-property-summary')!).textContent = `${state.bedrooms} Bed, ${state.bathrooms} Bath ${state.propertyType || 'Property'}`;
-        const list = document.getElementById('review-services')!;
+        document.getElementById('review-property-summary').textContent = `${state.bedrooms} Bed, ${state.bathrooms} Bath ${state.propertyType || 'Property'}`;
+        document.getElementById('review-address').textContent = state.propertyAddress || '‑';
+        document.getElementById('review-date').textContent = state.serviceDate ? state.serviceDate.split('-').reverse().join('/') : '‑';
+        document.getElementById('review-notes').textContent = state.specialRequests || '‑';
+        const list = document.getElementById('review-services');
         list.innerHTML = '<li>Standard Bond Clean</li>';
         state.addons.forEach(a => list.insertAdjacentHTML('beforeend', `<li>${a}</li>`));
       }
     };
 
     /* ---------- Helper: validation ---------- */
-    const toggleInvalid = (input: HTMLElement, isValid: boolean) => {
-      const msg = document.getElementById(input.getAttribute('aria-describedby')!);
+    const toggleInvalid = (input, isValid) => {
+      const msg = document.getElementById(input.getAttribute('aria-describedby'));
       input.classList.toggle('invalid', !isValid);
       input.setAttribute('aria-invalid', String(!isValid));
       if (msg) msg.hidden = isValid;
     };
 
-    const validateStep = (step: number): boolean => {
+    const validateStep = (step) => {
       let ok = true;
       if (step === 1) {
-        const sel = form.querySelector('#property-type') as HTMLSelectElement;
+        const sel = form.querySelector('#property-type');
         ok = sel.value.trim() !== '';
         toggleInvalid(sel, ok);
       } else if (step === 3) {
-        const name = form.querySelector('#full-name') as HTMLInputElement;
-        const phone = form.querySelector('#phone') as HTMLInputElement;
-        const email = form.querySelector('#email') as HTMLInputElement;
+        const name = form.querySelector('#full-name');
+        const phone = form.querySelector('#phone');
+        const email = form.querySelector('#email');
+        const address = form.querySelector('#property-address');
+        const iso = form.querySelector('#service-date').value;
         const phoneRE = /^(?:\+?61\s?)?(?:\(?0?[2-578]\)?\s?\d{4}\s?\d{4})$/; // AU format
         const emailRE = /^\S+@\S+\.\S+$/;
         const nameOk = name.value.trim() !== '';
         const phoneOk = phoneRE.test(phone.value);
         const emailOk = emailRE.test(email.value);
+        const addressOk = address.value.trim() !== '';
+        const dateOk = !!iso && new Date(iso) >= new Date(new Date().toISOString().split('T')[0]);
         toggleInvalid(name, nameOk);
         toggleInvalid(phone, phoneOk);
         toggleInvalid(email, emailOk);
-        ok = nameOk && phoneOk && emailOk;
+        toggleInvalid(address, addressOk);
+        toggleInvalid(form.querySelector('#service-date-display'), dateOk);
+        ok = nameOk && phoneOk && emailOk && addressOk && dateOk;
       }
       return ok;
     };
@@ -284,11 +344,11 @@
     const focusFirst = () => {
       const stepEl = formSteps[state.currentStep - 1];
       stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      const firstInput = stepEl.querySelector<HTMLElement>('input, select, textarea');
+      const firstInput = stepEl.querySelector('input, select, textarea');
       if (firstInput) {
         firstInput.focus({ preventScroll: true });
       } else {
-        stepEl.querySelector<HTMLElement>('.next-step, .prev-step')?.focus({ preventScroll: true });
+        stepEl.querySelector('.next-step, .prev-step')?.focus({ preventScroll: true });
       }
     };
 
@@ -296,7 +356,7 @@
     const savePending = () => {
       localStorage.setItem('pendingQuoteSubmission', JSON.stringify(state));
       if (errorBanner) {
-        (document.getElementById('form-submission-error-msg')!).textContent = `We couldn't submit your quote, but we've saved your progress. We'll try again automatically when you're back online.`;
+        document.getElementById('form-submission-error-msg').textContent = `We couldn't submit your quote, but we've saved your progress. We'll try again automatically when you're back online.`;
         errorBanner.classList.remove('hidden');
       }
     };
@@ -304,8 +364,8 @@
     const submitForm = async () => {
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.querySelector('.submit-text')!.classList.add('hidden');
-        submitBtn.querySelector('.loading-spinner')!.classList.remove('hidden');
+        submitBtn.querySelector('.submit-text').classList.add('hidden');
+        submitBtn.querySelector('.loading-spinner').classList.remove('hidden');
       }
       errorBanner?.classList.add('hidden');
 
@@ -317,6 +377,9 @@
       body.append('fullName', state.fullName);
       body.append('phone', state.phone);
       body.append('email', state.email);
+      body.append('propertyAddress', state.propertyAddress);
+      body.append('serviceDate', state.serviceDate);
+      body.append('specialRequests', state.specialRequests);
       state.addons.forEach(a => body.append('addons[]', a));
 
       try {
@@ -335,8 +398,8 @@
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.querySelector('.submit-text')!.classList.remove('hidden');
-          submitBtn.querySelector('.loading-spinner')!.classList.add('hidden');
+          submitBtn.querySelector('.submit-text').classList.remove('hidden');
+          submitBtn.querySelector('.loading-spinner').classList.add('hidden');
         }
       }
     };
@@ -345,7 +408,14 @@
 
     // Keep state in sync with inputs
     form.addEventListener('input', e => {
-      const t = e.target as HTMLInputElement;
+      const t = e.target;
+      // Prevent navigation/validation on calendar date selection
+      if (t.name === 'service-date') {
+        // Only update state, do NOT trigger validation or navigation
+        state.serviceDate = t.value;
+        console.log('[QuoteForm] Date selected:', t.value);
+        return;
+      }
       switch (t.name) {
         case 'property-type': state.propertyType = t.value; break;
         case 'bedrooms'     : state.bedrooms     = t.value; break;
@@ -353,37 +423,40 @@
         case 'full-name'    : state.fullName     = t.value; break;
         case 'phone'        : state.phone        = t.value; break;
         case 'email'        : state.email        = t.value; break;
+        case 'property-address': state.propertyAddress = t.value; break;
+        case 'special-requests': state.specialRequests = t.value; break;
         case 'addons':
-          state.addons = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="addons"]:checked')).map(c => c.value);
+          state.addons = Array.from(form.querySelectorAll('input[name="addons"]:checked')).map(c => c.value);
           break;
       }
     });
 
-    // Click‑based navigation & checkbox card highlight (mouse users)
     form.addEventListener('click', e => {
-      const tgt = e.target as HTMLElement;
+      const tgt = e.target;
       if (tgt.closest('.next-step')) {
+        console.log('[QuoteForm] Next button clicked');
         if (validateStep(state.currentStep)) {
           state.currentStep++;
           renderUI();
           focusFirst();
         }
       } else if (tgt.closest('.prev-step')) {
+        console.log('[QuoteForm] Prev button clicked');
         state.currentStep--;
         renderUI();
         focusFirst();
       } else if (tgt.closest('.form-checkbox-label')) {
-        const label = tgt.closest('.form-checkbox-label') as HTMLLabelElement;
-        const cb = label.querySelector<HTMLInputElement>('input[type="checkbox"]')!;
+        const label = tgt.closest('.form-checkbox-label');
+        const cb = label.querySelector('input[type="checkbox"]');
         label.classList.toggle('selected', cb.checked);
       }
     });
 
-    // Keyboard / screen‑reader change event ensures card highlight syncs
+    // IMPORTANT: keeps checkbox‑label styling and validation states in sync
     form.addEventListener('change', e => {
-      const cb = (e.target as HTMLElement).closest<HTMLInputElement>('input[name="addons"]');
+      const cb = e.target.closest('input[name="addons"]');
       if (cb) {
-        cb.parentElement!.classList.toggle('selected', cb.checked);
+        cb.parentElement.classList.toggle('selected', cb.checked);
       }
     });
 
@@ -427,6 +500,193 @@
   document.addEventListener('astro:after-swap', initQuoteForm);
 </script>
 
+<script>
+/* ----------------------------------------------------------
+ * Vanilla JS + Tailwind mini‑calendar (no external deps)
+ * ----------------------------------------------------------*/
+const today = new Date();
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const isSameDay  = (a, b) => startOfDay(a).getTime() === startOfDay(b).getTime();
+const addMonths  = (d, n) => new Date(d.getFullYear(), d.getMonth() + n, 1);
+const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
+
+class Calendar {
+  constructor(rootEl, { onSelect, minDate = today } = {}) {
+    this.root = typeof rootEl === 'string' ? document.querySelector(rootEl) : rootEl;
+    this.onSelect = onSelect;
+    this.minDate = startOfDay(minDate);
+    this.viewDate = new Date();
+    this.selected = null;
+    this._justSelected = false;
+    this._build();
+  }
+  open () {
+    this.pop.classList.remove('hidden');
+    this._render();
+    this._trapFocus();
+    setTimeout(() => document.addEventListener('mousedown', this._out = (e)=>{
+      // Only close if click is outside popover and not immediately after selecting a date
+      if (this._justSelected) {
+        this._justSelected = false;
+        return;
+      }
+      if (!this.pop.contains(e.target) && e.target.id !== 'calendar-trigger') this.close();
+    }));
+  }
+  close () {
+    this.pop.classList.add('hidden');
+    this._releaseFocus();
+    document.removeEventListener('mousedown', this._out);
+  }
+  _build () {
+    this.pop = document.createElement('div');
+    this.pop.className = `absolute z-50 mt-2 bg-white rounded-xl shadow-lg p-4 w-72 hidden`;
+    this.pop.setAttribute('role', 'dialog');
+    this.pop.setAttribute('aria-modal', 'true');
+    this.root.appendChild(this.pop);
+    const head = document.createElement('div');
+    head.className = 'flex items-center justify-between mb-2';
+    this.pop.appendChild(head);
+    this.prevBtn = this._btn('<i class="fas fa-chevron-left"></i>', () => { this.viewDate = addMonths(this.viewDate, -1); this._render(); });
+    this.nextBtn = this._btn('<i class="fas fa-chevron-right"></i>', () => { this.viewDate = addMonths(this.viewDate, 1);  this._render(); });
+    this.monthLabel = document.createElement('span');
+    this.monthLabel.className = 'font-semibold text-deep-navy';
+    head.append(this.prevBtn, this.monthLabel, this.nextBtn);
+    this.grid = document.createElement('div');
+    this.grid.className = 'calendar-grid grid grid-cols-7 gap-1 p-1';
+    this.grid.setAttribute('role', 'grid');
+    this.pop.appendChild(this.grid);
+    ['M','T','W','T','F','S','S'].forEach(ch => {
+      const th = document.createElement('div');
+      th.className = 'text-xs text-slate-500 flex justify-center';
+      th.textContent = ch;
+      this.grid.appendChild(th);
+    });
+    this.dayBtns = [];
+    for (let i=0;i<42;i++) {
+      const b = document.createElement('button');
+      b.type = 'button'; // prevent implicit submit
+      b.className = 'calendar-day w-9 h-9 flex items-center justify-center rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500';
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._select(b._date);
+      });
+      b.addEventListener('keydown', (e) => this._onKey(b, e));
+      this.dayBtns.push(b);
+      this.grid.appendChild(b);
+    }
+  }
+  _btn(html, cb) {
+    const btn = document.createElement('button');
+    btn.innerHTML = html;
+    btn.className = 'px-2 py-1 text-sky-600 hover:text-sky-800 focus:outline-none';
+    btn.type = 'button';
+    btn.addEventListener('click', cb);
+    return btn;
+  }
+  _render () {
+    const m = this.viewDate.toLocaleString('default', { month:'long', year:'numeric' });
+    this.monthLabel.textContent = m;
+    const firstOfMonth = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1);
+    const startOffset  = (firstOfMonth.getDay() + 6) % 7;
+    const startDate = new Date(firstOfMonth);
+    startDate.setDate(firstOfMonth.getDate() - startOffset);
+    for (let i=0;i<42;i++) {
+      const btn = this.dayBtns[i];
+      const d = new Date(startDate); d.setDate(startDate.getDate() + i);
+      btn._date = d;
+      btn.textContent = d.getDate();
+      const inMonth    = d.getMonth() === this.viewDate.getMonth();
+      const isDisabled = d < this.minDate;
+      const isSel      = this.selected && isSameDay(d, this.selected);
+      const isToday    = isSameDay(d, today);
+      btn.disabled = isDisabled;
+      btn.setAttribute('aria-selected', isSel);
+      btn.className = 'calendar-day w-9 h-9 flex items-center justify-center rounded-lg text-sm';
+      if (!inMonth)   btn.classList.add('text-slate-400');
+      if (isDisabled) btn.classList.add('text-slate-300','cursor-not-allowed');
+      if (isToday)    btn.classList.add('today');
+      if (isSel)      btn.classList.add('bg-sky-600','text-white');
+    }
+  }
+  _select (date) {
+    if (date < this.minDate) return;
+    this.selected = date;
+    this._render();
+    // Set flag so outside click handler does NOT close popover after date select
+    this._justSelected = true;
+    if (this.onSelect) this.onSelect(date.toISOString().split('T')[0]);
+    // Return focus to display input after selection
+    this.root.querySelector('#service-date-display')?.focus();
+  }
+  _onKey (btn, e) {
+    const map = {ArrowRight:1, ArrowLeft:-1, ArrowDown:7, ArrowUp:-7};
+    if (map[e.key] !== undefined) {
+      e.preventDefault();
+      const idx = this.dayBtns.indexOf(btn);
+      const next = this.dayBtns[idx + map[e.key]];
+      if (next) next.focus();
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      btn.click();
+    }
+    if (e.key === 'Escape') this.close();
+  }
+  _trapFocus () {
+    this._first = this.dayBtns.find(b => !b.disabled);
+    this._first && this._first.focus();
+    this._onDocKey = (e) => {
+      if (e.key === 'Tab') {
+        const focusable = this.dayBtns.filter(b => !b.disabled);
+        const first = focusable[0], last = focusable[focusable.length-1];
+        if (e.shiftKey && document.activeElement === first) {e.preventDefault(); last.focus();}
+        if (!e.shiftKey && document.activeElement === last) {e.preventDefault(); first.focus();}
+      }
+    };
+    document.addEventListener('keydown', this._onDocKey);
+  }
+  _releaseFocus () {
+    document.removeEventListener('keydown', this._onDocKey);
+  }
+}
+
+// Calendar popover logic
+if (typeof window !== 'undefined') {
+  document.addEventListener('astro:page-load', () => {
+    const isoInput = document.getElementById('service-date');
+    const displayInput = document.getElementById('service-date-display');
+    const trigger = document.getElementById('calendar-trigger');
+    const root = document.getElementById('calendar-root');
+    if (isoInput && displayInput && trigger && root) {
+      const cal = new Calendar(root, {
+        minDate: new Date(),
+        onSelect: (iso) => {
+          isoInput.value = iso;
+          displayInput.value = iso.split('-').reverse().join('/');
+          // Only dispatch input event, do NOT advance form step or close popover except via calendar logic
+          isoInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      // Prevent calendar popover from closing immediately on mousedown (desktop)
+      trigger.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        cal.open();
+      });
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+      });
+      displayInput.addEventListener('focus', () => cal.open());
+      // Prevent form navigation on calendar date select
+      root.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+      });
+    }
+  });
+}
+</script>
+
 <style>
   /* Basic transitions + states (you can migrate to Tailwind directive if preferred) */
   .form-step{display:none}
@@ -445,13 +705,54 @@
   .form-checkbox-label:has(input:checked){border-color:#0ea5e9;background:#f0f9ff}
 
   .step-indicator{display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
-  .step{display:flex;align-items:center;padding:0.5rem 1rem;color:#6b7280;flex-grow:1;justify-content:center}
-  .step .step-number{width:2rem;height:2rem;border-radius:50%;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .3s}
-  .step .step-label{display:none}
-  @media(min-width:768px){.step .step-label{display:block;margin-left:0.75rem;font-weight:500}}
-  .step.active .step-number{border-color:#0ea5e9;background:#0ea5e9;color:#fff}
-  .step.active{color:#0f172a;font-weight:700}
-  .step.completed .step-number{border-color:#16a34a;background:#16a34a;color:#fff}
+  .step,
+  .step .step-label,
+  .step .step-number {
+    @apply relative z-10;
+  }
+
+  .step {
+    @apply flex items-center px-4 py-2 text-slate-600 flex-grow justify-center;
+  }
+
+  .step .step-label {
+    @apply bg-white px-1 hidden md:inline-block ml-3 font-medium;
+  }
+
+  .step .step-number {
+    @apply bg-white inline-flex items-center justify-center w-8 h-8 rounded-full border-2 font-bold transition-all;
+    border-color: #d1d5db;
+  }
+
+  .step.active .step-number {
+    @apply bg-sky-500 border-sky-500 text-white;
+  }
+
+  .step.active {
+    @apply text-deep-navy font-bold;
+  }
+
+  .step.completed .step-number {
+    @apply bg-green-600 border-green-600 text-white;
+  }
 
   .loading-spinner.hidden,.submit-text.hidden{display:none}
+
+  /* Calendar styles */
+  .calendar-day {
+    @apply w-9 h-9 flex items-center justify-center rounded-lg text-sm;
+  }
+  .calendar-day[aria-selected="true"] {
+    @apply bg-sky-600 text-white;
+  }
+  .calendar-day:disabled {
+    @apply text-slate-300 cursor-not-allowed;
+  }
+  .calendar-day.ring-2 {
+    box-shadow: 0 0 0 2px #0ea5e9;
+    /* fallback for Tailwind ring-2 ring-sky-500 */
+  }
+  .calendar-day.today:not([aria-selected="true"]) {
+    box-shadow: 0 0 0 2px #0ea5e9;
+  }
 </style>
