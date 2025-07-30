@@ -1,103 +1,109 @@
 ---
 // src/layouts/MainLayout.astro
-/**
- * MainLayout.astro
- *
- * This is the primary layout component for the website.
- * It provides a consistent structure including header, main content area, and footer.
- * It handles essential SEO meta tags and provides slots for pages to inject custom head content
- * and main content. It no longer contains hardcoded schema, delegating that responsibility
- * to individual pages or components (like Schema.astro) via the 'head' slot.
- *
- * Props:
- * - title (string): The page title.
- * - description (string): The page meta description.
- */
+// SEO‑safe, performance‑first site shell.
 
-// --- INTERFACE ---
 export interface Props {
-  /**
-   * The title of the page. This will be used in the <title> tag and og:title.
-   */
   title: string;
-  /**
-   * The meta description of the page. Used in the meta description tag and og:description.
-   */
   description: string;
+  canonical?: string;
+  image?: string;
 }
 
-// Destructure the props passed to the layout.
-const { title, description } = Astro.props;
+const { title, description, canonical, image } = Astro.props;
 
-// --- COMPONENTS & DATA ---
-// Import shared components used across the site.
 import Header from '~/components/Header.astro';
 import Footer from '~/components/Footer.astro';
-
-// Import utility data needed by child components (e.g., Header).
 import { suburbs } from '~/utils/geoHandler.js';
 
-// --- ASTRO FEATURES ---
-// Enable View Transitions for smooth navigation between pages.
 import { ViewTransitions } from 'astro:transitions';
-
-// --- GLOBAL STYLES ---
-// Import the main stylesheet. Astro will process and bundle this.
 import '~/styles/input.css';
----
 
-<!doctype html>
+const siteUrl  = Astro.site?.toString() ?? 'https://onendonebondclean.com.au';
+const pageUrl  = canonical
+  ? new URL(canonical, siteUrl).toString()
+  : new URL(Astro.url?.pathname ?? '/', siteUrl).toString();
+const ogImage  = new URL(image ?? '/images/og.jpg', siteUrl).toString();
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "CleaningService",
+  "name": "One N Done Bond Clean",
+  "url": siteUrl,
+  "telephone": "+61405779420",
+  "priceRange": "$$",
+  "image": ogImage,
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Redbank Plains",
+    "addressRegion": "QLD",
+    "postalCode": "4301",
+    "addressCountry": "AU"
+  },
+  "areaServed": suburbs.map(name => ({ "@type": "Place", "name": name })),
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": -27.6413,
+    "longitude": 152.9006
+  },
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+    "opens": "08:00",
+    "closes": "18:00"
+  }]
+};
+---
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
   <head>
-    <!-- Essential Meta Tags -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Generator meta tag (useful for debugging Astro version) -->
-    <meta name="generator" content={Astro.generator} />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Primary SEO Meta Tags -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={pageUrl} />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content="bond cleaning, end of lease cleaning, exit clean, Redbank Plains, Brisbane, One N Done" />
+    <meta name="author" content="One N Done Bond Clean" />
+    <meta name="generator" content={Astro.generator} />
 
-    <!-- Open Graph / Social Media Meta Tags -->
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={pageUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <!-- It's good practice to have an og:image, adjust path as needed -->
-    <meta property="og:image" content={new URL('/images/og.jpg', Astro.site).href} />
-    <!-- Ensure Astro.site is correctly configured in astro.config.mjs -->
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content="Bond cleaning in action by One N Done" />
+    <meta property="og:locale" content="en_AU" />
 
-    <!-- 
-      Named slot for pages to inject additional elements into the <head>.
-      This is crucial for:
-      - Page-specific canonical links
-      - Page-specific structured data (e.g., Schema.astro component)
-      - Page-specific styles or scripts
-    -->
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@OneNDoneClean" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Performance hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Structured data (inline to avoid hoisting) -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(localBusinessSchema)} />
+
     <slot name="head" />
 
-    <!-- Enable Astro's client-side View Transitions -->
     <ViewTransitions />
   </head>
-  <body class="bg-light-gray font-sans text-gray-warm-800">
-    <!-- 
-      Render the Header component.
-      Pass the static 'suburbs' data down so the Header can use it for navigation or display.
-    -->
+  <body class="bg-light-gray font-sans text-gray-warm-800 antialiased">
     <Header suburbs={suburbs} />
 
-    <!-- Main content area of the page -->
     <main>
-      <!-- 
-        Default slot for the main content of the page.
-        Whatever is placed between the opening and closing tags of this layout
-        in a page file will be rendered here.
-      -->
       <slot />
     </main>
 
-    <!-- Render the Footer component -->
     <Footer />
   </body>
 </html>
